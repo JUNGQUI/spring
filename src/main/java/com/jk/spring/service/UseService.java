@@ -2,6 +2,7 @@ package com.jk.spring.service;
 
 import com.jk.spring.inherit.ICommonAInterface;
 import com.jk.spring.inherit.ICommonInterface;
+import com.jk.spring.overLoadRide.IOverLoadingAndRiding;
 import com.jk.spring.strategy.IContextMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,14 +17,21 @@ public class UseService {
 
     private final IContextMethod iContextMethod;
 
+    private final IOverLoadingAndRiding overLoadingAndRidingV1;
+    private final IOverLoadingAndRiding overLoadingAndRidingV2;
+
     @Autowired
     public UseService(@Qualifier("commonService") ICommonInterface iCommonInterface,
                       @Qualifier("commonAService") ICommonInterface iACommonInterface,
-                      ICommonAInterface iCommonAInterface, IContextMethod iContextMethod) {
+                      ICommonAInterface iCommonAInterface, IContextMethod iContextMethod,
+                      @Qualifier("overLoadingAndRidingV1") IOverLoadingAndRiding overLoadingAndRidingV1,
+                      @Qualifier("overLoadingAndRidingV2") IOverLoadingAndRiding overLoadingAndRidingV2) {
         this.iCommonInterface = iCommonInterface;
         this.iACommonInterface = iACommonInterface;
         this.iCommonAInterface = iCommonAInterface;
         this.iContextMethod = iContextMethod;
+        this.overLoadingAndRidingV1 = overLoadingAndRidingV1;
+        this.overLoadingAndRidingV2 = overLoadingAndRidingV2;
     }
 
     public void useInterface () {
@@ -42,5 +50,13 @@ public class UseService {
     public void useStartegy () {
         iContextMethod.contextMethod("choose strategy ", "A");
         iContextMethod.contextMethod("choose strategy ", "B");
+    }
+
+    public void useOverLoadingAndRiding(String returnValue) {
+        overLoadingAndRidingV1.loadingTest();
+        overLoadingAndRidingV1.loadingTest(returnValue);
+
+        overLoadingAndRidingV2.loadingTest();
+        overLoadingAndRidingV2.loadingTest(returnValue);
     }
 }
