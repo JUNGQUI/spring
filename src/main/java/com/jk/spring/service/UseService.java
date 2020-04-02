@@ -1,5 +1,8 @@
 package com.jk.spring.service;
 
+import com.jk.spring.IOCAndDI.ITransport;
+import com.jk.spring.IOCAndDI.TraditionalTransportBike;
+import com.jk.spring.IOCAndDI.TraditionalTransportCar;
 import com.jk.spring.inherit.ICommonAInterface;
 import com.jk.spring.inherit.ICommonInterface;
 import com.jk.spring.overLoadRide.IOverLoadingAndRiding;
@@ -15,11 +18,14 @@ public class UseService {
     private final ICommonInterface iACommonInterface;
     private final ICommonAInterface iCommonAInterface;
 
-    private final IContextMethod iContextMethodA;
-    private final IContextMethod iContextMethodB;
-
     private final IOverLoadingAndRiding overLoadingAndRidingV1;
     private final IOverLoadingAndRiding overLoadingAndRidingV2;
+
+    private final ITransport tb;
+    private final ITransport tc;
+
+    private final IContextMethod iContextMethodA;
+    private final IContextMethod iContextMethodB;
 
     @Autowired
     public UseService(@Qualifier("commonService") ICommonInterface iCommonInterface,
@@ -28,7 +34,8 @@ public class UseService {
                       @Qualifier("contextMethodA") IContextMethod iContextMethodA,
                       @Qualifier("contextMethodB") IContextMethod iContextMethodB,
                       @Qualifier("overLoadingAndRidingV1") IOverLoadingAndRiding overLoadingAndRidingV1,
-                      @Qualifier("overLoadingAndRidingV2") IOverLoadingAndRiding overLoadingAndRidingV2) {
+                      @Qualifier("overLoadingAndRidingV2") IOverLoadingAndRiding overLoadingAndRidingV2,
+                      @Qualifier("transportBike") ITransport tb, @Qualifier("transportCar") ITransport tc) {
         this.iCommonInterface = iCommonInterface;
         this.iACommonInterface = iACommonInterface;
         this.iCommonAInterface = iCommonAInterface;
@@ -36,6 +43,8 @@ public class UseService {
         this.iContextMethodB = iContextMethodB;
         this.overLoadingAndRidingV1 = overLoadingAndRidingV1;
         this.overLoadingAndRidingV2 = overLoadingAndRidingV2;
+        this.tb = tb;
+        this.tc = tc;
     }
 
     public void useInterface () {
@@ -70,6 +79,18 @@ public class UseService {
         print("over v2.");
         overLoadingAndRidingV2.loadingTest();
         overLoadingAndRidingV2.loadingTest(returnValue);
+    }
+
+    public void userIOC_DI() {
+        print("Traditional way");
+        TraditionalTransportBike ttb = new TraditionalTransportBike();
+        TraditionalTransportCar ttc = new TraditionalTransportCar();
+
+        ttb.transport();
+        ttc.transport();
+
+        tb.transfer();
+        tc.transfer();
     }
 
     private void print(String value) {

@@ -19,6 +19,7 @@ public class ApplicationTests {
         useService.useInterface();
         useService.useStartegy();
         useService.useOverLoadingAndRiding("J Tag?");
+        useService.userIOC_DI();
     }
 
 }
