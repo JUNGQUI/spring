@@ -3,6 +3,7 @@ package com.jk.spring.service;
 import com.jk.spring.IOCAndDI.ITransport;
 import com.jk.spring.IOCAndDI.TraditionalTransportBike;
 import com.jk.spring.IOCAndDI.TraditionalTransportCar;
+import com.jk.spring.aop.CustomAspect;
 import com.jk.spring.inherit.ICommonAInterface;
 import com.jk.spring.inherit.ICommonInterface;
 import com.jk.spring.overLoadRide.IOverLoadingAndRiding;
@@ -81,6 +82,7 @@ public class UseService {
         overLoadingAndRidingV2.loadingTest(returnValue);
     }
 
+    @CustomAspect
     public void userIOC_DI() {
         print("Traditional way");
         TraditionalTransportBike ttb = new TraditionalTransportBike();

@@ -23,7 +23,7 @@ public class FinalAndStatic {
 
             STATIC_STRING.addAll(finalString);
 
-            finalString = new ArrayList<>();
+//            finalString = new ArrayList<>();
             // error 가 발생한다, IDE 가 좋아서 그런지 아예 디버깅이 안된다.
             // 다만 중점적으로 봐야 할 부분은 final 이 완벽한 immutable 이 아니라는 것, 할당 이후 list 나 array 일 경우 값을 추가함으로
             // 값의 변화가 일어 날 수 있다. 물론, String 이나 (string 은 애시당초 immutable 이지만) int 와 같은 값으로 재할당은 당연히 안된다.
