@@ -7,6 +7,6 @@ inherit : extends, implements 등을 이용해서 만든 interface, service pack
 strategy : DI를 설명해주는 전략 패턴 package<br/>
 IOCAndDI : IOC 와 DI 개념 적용된 package<br/>
 overLoadRide : overload 와 override 개념 package<br/>
-finalAndStatic : final, static 개념 설명 package, error 는 의도된 부분<br/>
+finalAndStatic : final, static 개념 설명 package<br/>
 pojo : POJO 개념이 적용된 class 가 있는 package<br/>
-aop : AOP class 가 존재, advise 를 annotation 방식으로 구현했다. aop method 값은 간단한 logging.
+aop : AOP class 가 존재, join point 는 annotation 방식으로 구현했다. advise 는 간단한 logging.
