@@ -37,14 +37,19 @@ public class ApplicationTests {
 
         testObjectRepository.saveAndFlush(saved);
         List<TestObject> testObjects = testObjectRepository.findAll();
-        
-        TestObject updated = TestObject.builder()
-                .id(testObjects.get(0).getId())
-                .name("JK-Test")
-                .content("자 데이터가 변경되었다.")
-                .build();
 
-        testObjectRepository.saveAndFlush(updated);
+        // 잘못된 수정 방식
+//        TestObject updated = TestObject.builder()
+//                .id(testObjects.get(0).getId())
+//                .name("JK-Test")
+//                .content("자 데이터가 변경되었다.")
+//                .build();
+//
+//        testObjectRepository.saveAndFlush(updated);
+
+        // DDD 와 builder pattern 의 올바른 수정 방식
+        testObjects.get(0).changeContent("자 데이터가 변경되었다.");
+        testObjectRepository.saveAndFlush(testObjects.get(0));
     }
 
 }
