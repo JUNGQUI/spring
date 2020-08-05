@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -21,7 +22,12 @@ public class TestObject {
     private Long id;
 
     private String name;
-    @Lob
+
+    // lob 절 대 쓰 지 마
+    // 뭔가 방법이 있을텐데, ResultSet extract 를 실패한다.
+//    @Lob
+//    @Column(columnDefinition = "text")
+    @Type(type = "text")
     private String content;
 
     @Temporal(TemporalType.TIMESTAMP)

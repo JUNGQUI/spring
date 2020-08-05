@@ -2,19 +2,23 @@ package com.jk.spring;
 
 import com.jk.spring.builder.TestObject;
 import com.jk.spring.builder.TestObjectRepository;
+import com.jk.spring.builder.TestObjectSpecs;
 import com.jk.spring.service.UseService;
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class ApplicationTests {
+
+    private final static FastDateFormat FDF = FastDateFormat.getInstance("yyyyMMdd");
 
     @Autowired
     private TestObjectRepository testObjectRepository;
@@ -28,6 +32,19 @@ public class ApplicationTests {
 //        useService.useStartegy();
         useService.useOverLoadingAndRiding("J Tag?");
 //        useService.userIOC_DI();
+
+        // spec 으로 이와 같은 query 를
+        List<TestObject> testObject_byName = testObjectRepository.findByName("JK-Test");
+        // 이렇게 바꿀 수 있다.
+        List<TestObject> testObjects_specByName = testObjectRepository.findAll(TestObjectSpecs.withName("JK-Test"));
+
+        // like 검색 시 %%붙여야 하는거 실화냐
+        // jpa repository 기본 설정이 저런가 봄
+        List<TestObject> testObjects_byContent = testObjectRepository.findByContentLike("%데이터가%");
+
+        Map<TestObjectSpecs.SearchKey, String> condition = new HashMap<>();
+        condition.put(TestObjectSpecs.SearchKey.CONTENT, "데이터가");
+        List<TestObject> testObjects_specByContent = testObjectRepository.findAll(TestObjectSpecs.withSearchKey(condition));
 
         TestObject saved = TestObject.builder()
                 .name("JK_Test")
@@ -50,6 +67,36 @@ public class ApplicationTests {
         // DDD 와 builder pattern 의 올바른 수정 방식
         testObjects.get(0).changeContent("JK-Test", "자 데이터가 변경되었다.");
         testObjectRepository.saveAndFlush(testObjects.get(0));
+
+        Calendar calendar = Calendar.getInstance();
+
+        String test = "";
+
+        setSomething(test);
+
+        System.out.println("J Tag");
+
     }
 
+    private void setSomething(String something) {
+        something = "nothing";
+    }
+
+
+    @Test
+    public void simpleJavaTest() {
+        TestObject test = TestObject.builder()
+                .name("이름")
+                .content("컨텐츠")
+                .createdDate(new Date())
+                .build();
+
+        List<TestObject> testObjects = new ArrayList<>();
+
+        testObjects.add(test);
+
+        test.changeContent("이름2", "컨텐츠2");
+        int result = 0;
+        System.out.println("J Tag");
+    }
 }
