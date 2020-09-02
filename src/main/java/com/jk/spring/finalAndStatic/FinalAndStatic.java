@@ -5,38 +5,63 @@ import java.util.List;
 
 public class FinalAndStatic {
 
-    static List<String> STATIC_STRING = new ArrayList<>();
+    public static class StaticInteger {
+        int nonStaticInteger = 0;
+        static int staticInteger = 0;
 
-    public void finalAndStatic () {
-        try {
-            final List<String> finalString = new ArrayList<>();
+        StaticInteger() {
+            nonStaticInteger++;
+            staticInteger++;
+        }
 
-            finalString.add("test1");
-            finalString.add("test2");
-            finalString.add("test3");
-
-            STATIC_STRING.addAll(finalString);
-
-            finalString.add("test5");
-            finalString.add("test6");
-            finalString.add("test7");
-
-            STATIC_STRING.addAll(finalString);
-
-            // error 가 발생한다.
-            // 다만 중점적으로 봐야 할 부분은 final 이 완벽한 immutable 이 아니라는 것, 할당 이후 list 나 array 일 경우 값을 추가함으로
-            // 값의 변화가 일어 날 수 있다. 물론, String 이나 (string 은 애시당초 immutable 이지만) int 와 같은 값으로 재할당은 당연히 안된다.
-//            finalString = new ArrayList<>();
-
-            this.staticTest();
-        } catch (Exception ex) {
-            this.staticTest();
+        public void getStaticInteger() {
+            System.out.println("static integer : " + staticInteger);
         }
     }
 
-    private void staticTest() {
-        for (String temp : STATIC_STRING) {
-            System.out.println(temp);
+    public void finalTest () {
+        try {
+            final List<String> finalStrings = new ArrayList<>();
+
+            System.out.println("list size : " + finalStrings.size());
+
+            finalStrings.add("test1");
+            finalStrings.add("test2");
+            finalStrings.add("test3");
+
+            System.out.println("list size : " + finalStrings.size());
+
+            if (finalStrings.size() > 0) {
+                for (String finalString : finalStrings) {
+                    System.out.println("list element : " + finalString);
+                }
+            }
+
+            finalStrings.add("test5");
+            finalStrings.add("test6");
+            finalStrings.add("test7");
+
+            if (finalStrings.size() > 0) {
+                for (String finalString : finalStrings) {
+                    System.out.println("again, list element : " + finalString);
+                }
+            }
+
+            System.out.println("list size : " + finalStrings.size());
+        } catch (Exception ex) {
+            System.out.println("exception occur : " + ex.getMessage());
         }
+    }
+
+    public void staticTest() {
+        StaticInteger one = new StaticInteger();
+
+        System.out.println("first : " + one.nonStaticInteger);
+        one.getStaticInteger();
+
+        StaticInteger two = new StaticInteger();
+
+        System.out.println("second : " + two.nonStaticInteger);
+        two.getStaticInteger();
     }
 }

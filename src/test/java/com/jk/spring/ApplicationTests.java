@@ -3,6 +3,7 @@ package com.jk.spring;
 import com.jk.spring.builder.TestObject;
 import com.jk.spring.builder.TestObjectRepository;
 import com.jk.spring.builder.TestObjectSpecs;
+import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.service.UseService;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.junit.Test;
@@ -27,11 +28,6 @@ public class ApplicationTests {
 
     @Autowired
     private UseService useService;
-
-    @Test
-    public void POJOTest() {
-
-    }
 
     @Test
     public void contextLoads() {
