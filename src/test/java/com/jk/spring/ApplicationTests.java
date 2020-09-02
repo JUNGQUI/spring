@@ -3,14 +3,12 @@ package com.jk.spring;
 import com.jk.spring.builder.TestObject;
 import com.jk.spring.builder.TestObjectRepository;
 import com.jk.spring.builder.TestObjectSpecs;
-import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.service.UseService;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
@@ -29,9 +27,17 @@ public class ApplicationTests {
     @Autowired
     private UseService useService;
 
+    private void regex(String something) {
+        System.out.println(something.matches("[-]?[0-9]*")); //음수 양수 숫자만
+    }
+
+    @Test
+    public void extendAndImplements() {
+        useService.useInterface();
+    }
+
     @Test
     public void contextLoads() {
-//        useService.useInterface();
 //        useService.useStartegy();
         useService.useOverLoadingAndRiding("J Tag?");
 //        useService.userIOC_DI();

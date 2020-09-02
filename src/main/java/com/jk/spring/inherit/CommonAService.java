@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class CommonAService extends CommonService implements ICommonAInterface {
 
-//    @Override
-//    public void read() {
-//        System.out.println("read CommonAService");
-//    }
-//
-//    @Override
-//    public void write() {
-//        System.out.println("write CommonAService");
-//    }
+    @Override
+    public void read() {
+        System.out.println("read CommonAService");
+    }
+
+    @Override
+    public void write() {
+        System.out.println("write CommonAService");
+    }
 
     @Override
     public void update() {

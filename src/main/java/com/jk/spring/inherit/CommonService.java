@@ -17,4 +17,5 @@ public class CommonService implements ICommonInterface {
     public void write() {
         System.out.println("write CommonService");
     }
+
 }

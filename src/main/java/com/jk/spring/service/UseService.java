@@ -4,6 +4,7 @@ import com.jk.spring.IOCAndDI.ITransport;
 import com.jk.spring.IOCAndDI.TraditionalTransportBike;
 import com.jk.spring.IOCAndDI.TraditionalTransportCar;
 import com.jk.spring.aop.CustomAspect;
+import com.jk.spring.inherit.CommonExtendService;
 import com.jk.spring.inherit.ICommonAInterface;
 import com.jk.spring.inherit.ICommonInterface;
 import com.jk.spring.overLoadRide.IOverLoadingAndRiding;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UseService {
+
+    private final CommonExtendService commonExtendService;
 
     private final ICommonInterface iCommonInterface;
     private final ICommonInterface iACommonInterface;
@@ -29,7 +32,8 @@ public class UseService {
     private final IContextMethod iContextMethodB;
 
     @Autowired
-    public UseService(@Qualifier("commonService") ICommonInterface iCommonInterface,
+    public UseService(CommonExtendService commonExtendService,
+                      @Qualifier("commonService") ICommonInterface iCommonInterface,
                       @Qualifier("commonAService") ICommonInterface iACommonInterface,
                       ICommonAInterface iCommonAInterface,
                       @Qualifier("contextMethodA") IContextMethod iContextMethodA,
@@ -37,6 +41,7 @@ public class UseService {
                       @Qualifier("overLoadingAndRidingV1") IOverLoadingAndRiding overLoadingAndRidingV1,
                       @Qualifier("overLoadingAndRidingV2") IOverLoadingAndRiding overLoadingAndRidingV2,
                       @Qualifier("transportBike") ITransport tb, @Qualifier("transportCar") ITransport tc) {
+        this.commonExtendService = commonExtendService;
         this.iCommonInterface = iCommonInterface;
         this.iACommonInterface = iACommonInterface;
         this.iCommonAInterface = iCommonAInterface;
@@ -49,6 +54,12 @@ public class UseService {
     }
 
     public void useInterface () {
+        commonExtendService.read();
+        commonExtendService.write();
+
+        commonExtendService.newRead();
+        commonExtendService.newWrite();
+
         print("common interface.");
         // 공용의 method 에 별도의 override 된 method
         iCommonInterface.read();
