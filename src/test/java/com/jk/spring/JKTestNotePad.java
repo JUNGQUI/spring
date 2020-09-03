@@ -2,6 +2,7 @@ package com.jk.spring;
 
 import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.finalAndStatic.JKStaticMethod;
+import com.jk.spring.lock.JKLock;
 import org.junit.Test;
 
 public class JKTestNotePad {
@@ -27,5 +28,70 @@ public class JKTestNotePad {
         JKStaticMethod jkStaticMethod = new JKStaticMethod();
         jkStaticMethod.staticMethod();
         JKStaticMethod.staticMethod();
+    }
+
+    @Test
+    public synchronized void threadTest() {
+        try {
+            JKLock jkLock = new JKLock();
+
+            long startSync = System.currentTimeMillis();
+
+            new Thread(() -> {
+                for (int i = 0; i < 10; i++) {
+                    jkLock.checkSync("synchronized A");
+                }
+
+                System.out.println("------------------ Sync A : " + (System.currentTimeMillis() - startSync));
+            }).start();
+
+            new Thread(() -> {
+                for (int i = 0; i < 10; i++) {
+                    jkLock.checkSync("synchronized B");
+                }
+
+                System.out.println("------------------ Sync B : " + (System.currentTimeMillis() - startSync));
+            }).start();
+
+            long startReentrant = System.currentTimeMillis();
+
+            new Thread(() -> {
+                for (int i = 0; i < 10; i++) {
+                    jkLock.checkReentrantLock("Reentrant A");
+                }
+
+                System.out.println("------------------ Reentrant A : " + (System.currentTimeMillis() - startReentrant));
+            }).start();
+
+            new Thread(() -> {
+                for (int i = 0; i < 10; i++) {
+                    jkLock.checkReentrantLock("Reentrant B");
+                }
+
+                System.out.println("------------------ Reentrant B : " + (System.currentTimeMillis() - startReentrant));
+            }).start();
+
+            long startNoneLock = System.currentTimeMillis();
+
+            new Thread(() -> {
+                for (int i = 0; i < 10; i++) {
+                    jkLock.noneLock("NoneLock A");
+                }
+
+                System.out.println("------------------ None A : " + (System.currentTimeMillis() - startNoneLock));
+            }).start();
+
+            new Thread(() -> {
+                for (int i = 0; i < 10; i++) {
+                    jkLock.noneLock("NoneLock B");
+                }
+
+                System.out.println("------------------ None B : " + (System.currentTimeMillis() - startNoneLock));
+            }).start();
+
+            wait(1000);
+        } catch (Exception ex) {
+            System.out.println("J Tag");
+        }
     }
 }
