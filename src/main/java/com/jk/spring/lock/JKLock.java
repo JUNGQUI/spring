@@ -11,6 +11,8 @@ public class JKLock {
 
     public void checkReentrantLock(String threadId) {
         reentrantLock.lock();
+//        reentrantLock.tryLock();
+//        reentrantLock.lockInterruptibly();
         System.out.println("JK Thread in (Reentrant) : " + threadId);
         reentrantLock.unlock();
     }
