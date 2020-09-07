@@ -47,6 +47,13 @@ public class JKTestNotePad {
                 System.out::println
         );
 
+        JKLambda jkLambda1 = new JKLambda() {
+            @Override
+            public String stringConcat(String s1, String s2) {
+                return s1 + " " + s2 + "JK lambda, no lambda";
+            }
+        };
+
         JKLambda jKlambda = (a, b) -> a + " " + b + " JK lambda, first";
         JKLambda jklambda2 = (a, b) -> b + " " + a + " JK lambda, second";
 
