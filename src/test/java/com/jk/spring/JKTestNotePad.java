@@ -2,8 +2,12 @@ package com.jk.spring;
 
 import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.finalAndStatic.JKStaticMethod;
+import com.jk.spring.lambda.JKLambda;
 import com.jk.spring.lock.JKLock;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JKTestNotePad {
 
@@ -28,6 +32,31 @@ public class JKTestNotePad {
         JKStaticMethod jkStaticMethod = new JKStaticMethod();
         jkStaticMethod.staticMethod();
         JKStaticMethod.staticMethod();
+    }
+
+    @Test
+    public void lambdaTest() {
+        List<String> list=new ArrayList<>();
+        list.add("1");
+        list.add("2");
+        list.add("3");
+        list.add("4");
+        list.add("5");
+        list.forEach(
+                // lambda expression
+                System.out::println
+        );
+
+        JKLambda jKlambda = (a, b) -> a + " " + b + " JK lambda, first";
+        JKLambda jklambda2 = (a, b) -> b + " " + a + " JK lambda, second";
+
+        String concatenatedString = jKlambda.stringConcat("first", "second");
+        String concatenatedString2 = jklambda2.stringConcat("second", "first");
+
+        System.out.println(concatenatedString);
+        System.out.println(concatenatedString2);
+
+        System.out.println("J Tag");
     }
 
     @Test
