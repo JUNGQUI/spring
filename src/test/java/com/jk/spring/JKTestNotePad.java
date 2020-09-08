@@ -66,8 +66,12 @@ public class JKTestNotePad {
         // [1, 2, 3, 4, 5]
         LongStream longStream = LongStream.rangeClosed(1, 5);
 
+        List<Integer> newintCollections = intStream.boxed().collect(Collectors.toList());
+
+        // boxed 로 처리 했기 때문에 사용 불가능
         IntStream newIntStream1 = intStream.map((element)-> element > 2 ? element-1 : element + 1);
 
+        // 이미 한번 수행했기 때문에 exception 발생
         IntStream newIntStream2 = intStream.map((element) -> {
             if (element > 2) {
                 return element+1;
@@ -85,16 +89,23 @@ public class JKTestNotePad {
                         .filter(langName -> langName.contains("a"));
 
         // [Go, Groovy, Java, Python, Scala, Swift]
-        List<String> comp1 = lang.stream().sorted().collect(Collectors.toList());
+        List<String> comp1 = lang.stream().sorted()
+                .collect(Collectors.toList());
 
         // [Swift, Scala, Python, Java, Groovy, Go]
-        List<String> comp2 = lang.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        List<String> comp2 = lang.stream().sorted(
+                Comparator.reverseOrder())
+                .collect(Collectors.toList());
 
         // [Go, Java, Scala, Swift, Groovy, Python]
-        List<String> comp3 = lang.stream().sorted(Comparator.comparingInt(String::length)).collect(Collectors.toList());
+        List<String> comp3 = lang.stream().sorted(
+                Comparator.comparingInt(String::length))
+                .collect(Collectors.toList());
 
         // [Groovy, Python, Scala, Swift, Java, Go]
-        List<String> comp4 = lang.stream().sorted((s1, s2) -> s2.length() - s1.length()).collect(Collectors.toList());
+        List<String> comp4 = lang.stream().sorted(
+                (s1, s2) -> s2.length() - s1.length())
+                .collect(Collectors.toList());
 
         System.out.println("J Tag");
     }
