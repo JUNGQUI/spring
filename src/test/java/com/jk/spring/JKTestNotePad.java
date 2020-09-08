@@ -7,10 +7,7 @@ import com.jk.spring.lambda.JKLambda;
 import com.jk.spring.lock.JKLock;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -69,7 +66,22 @@ public class JKTestNotePad {
         List<Integer> newintCollections = intStream.boxed().collect(Collectors.toList());
 
         // boxed 로 처리 했기 때문에 사용 불가능
-        IntStream newIntStream1 = intStream.map((element)-> element > 2 ? element-1 : element + 1);
+//        IntStream newIntStream1 = intStream.map((element)-> element > 2 ? element-1 : element + 1);
+
+//        OptionalInt optionalInt = newintCollections.stream().reduce((element1, element2) -> element1 + element2);
+        Optional<Integer> optionalInteger = newintCollections.stream().reduce(
+                (element1, element2) -> {
+                    System.out.println(element1 + " + " + element2);
+                    return element1 + element2;
+                });
+
+        int identityInteger = newintCollections.stream().reduce(
+                10,
+                Integer::sum,
+                (element1, element2) -> {
+                    System.out.println(element1 + " + " + element2);
+                    return element1 + element2;
+                });
 
         // 이미 한번 수행했기 때문에 exception 발생
         IntStream newIntStream2 = intStream.map((element) -> {
