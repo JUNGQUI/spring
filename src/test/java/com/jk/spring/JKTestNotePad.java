@@ -1,5 +1,6 @@
 package com.jk.spring;
 
+import com.jk.spring.JKStream.JKStreamObj;
 import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.finalAndStatic.JKStaticMethod;
 import com.jk.spring.lambda.JKLambda;
@@ -7,7 +8,13 @@ import com.jk.spring.lock.JKLock;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 public class JKTestNotePad {
 
@@ -35,6 +42,46 @@ public class JKTestNotePad {
     }
 
     @Test
+    public void JKStream() {
+        List<JKStreamObj> jkStreamObjs = new ArrayList<>();
+
+        jkStreamObjs.add(new JKStreamObj(1, "1번 value"));
+        jkStreamObjs.add(new JKStreamObj(3, "3번 value"));
+        jkStreamObjs.add(new JKStreamObj(2, "2번 value"));
+        jkStreamObjs.add(new JKStreamObj(5, "5번 value"));
+        jkStreamObjs.add(new JKStreamObj(4, "4번 value"));
+
+        Stream<Integer> jkStreamIdStream = jkStreamObjs.stream().map(JKStreamObj::getId);
+
+        Stream<String> builderStream =
+                Stream.<String>builder()
+                        .add("Eric").add("Elena").add("Java")
+                        .build(); // [Eric, Elena, Java]
+
+        Stream<Integer> iteratedStream =
+                Stream.iterate(30, n -> n + 2).limit(5); // [30, 32, 34, 36, 38]
+
+        IntStream intStream = IntStream.range(1, 5); // [1, 2, 3, 4]
+        LongStream longStream = LongStream.rangeClosed(1, 5); // [1, 2, 3, 4, 5]
+
+        List<String> lang = Arrays.asList("Java", "Scala", "Groovy", "Python", "Go", "Swift");
+
+        // [Go, Groovy, Java, Python, Scala, Swift]
+        List<String> comp1 = lang.stream().sorted().collect(Collectors.toList());
+
+        // [Swift, Scala, Python, Java, Groovy, Go]
+        List<String> comp2 = lang.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+
+        // [Go, Java, Scala, Swift, Groovy, Python]
+        List<String> comp3 = lang.stream().sorted(Comparator.comparingInt(String::length)).collect(Collectors.toList());
+
+        // [Groovy, Python, Scala, Swift, Java, Go]
+        List<String> comp4 = lang.stream().sorted((s1, s2) -> s2.length() - s1.length()).collect(Collectors.toList());
+
+        System.out.println("J Tag");
+    }
+
+    @Test
     public void lambdaTest() {
         List<String> list=new ArrayList<>();
         list.add("1");
@@ -43,8 +90,13 @@ public class JKTestNotePad {
         list.add("4");
         list.add("5");
         list.forEach(
-                // lambda expression
+                // double colon operator
                 System.out::println
+        );
+
+        list.forEach(
+                // lambda expression
+                s->System.out.println(s)
         );
 
         JKLambda jkLambda1 = new JKLambda() {
