@@ -53,18 +53,36 @@ public class JKTestNotePad {
 
         Stream<Integer> jkStreamIdStream = jkStreamObjs.stream().map(JKStreamObj::getId);
 
-        Stream<String> builderStream =
-                Stream.<String>builder()
-                        .add("Eric").add("Elena").add("Java")
-                        .build(); // [Eric, Elena, Java]
+        Stream<String> builderStream = Stream.<String>builder()
+                .add("A").add("B").add("C")
+                .build(); // [A, B, C]
 
-        Stream<Integer> iteratedStream =
-                Stream.iterate(30, n -> n + 2).limit(5); // [30, 32, 34, 36, 38]
+        // [15, 17, 19, 21, 23]
+        Stream<Integer> iteratedStream = Stream.iterate(15, n -> n + 2).limit(5);
 
-        IntStream intStream = IntStream.range(1, 5); // [1, 2, 3, 4]
-        LongStream longStream = LongStream.rangeClosed(1, 5); // [1, 2, 3, 4, 5]
+        // [1, 2, 3, 4]
+        IntStream intStream = IntStream.range(1, 5);
 
-        List<String> lang = Arrays.asList("Java", "Scala", "Groovy", "Python", "Go", "Swift");
+        // [1, 2, 3, 4, 5]
+        LongStream longStream = LongStream.rangeClosed(1, 5);
+
+        IntStream newIntStream1 = intStream.map((element)-> element > 2 ? element-1 : element + 1);
+
+        IntStream newIntStream2 = intStream.map((element) -> {
+            if (element > 2) {
+                return element+1;
+            } else {
+                return element-1;
+            }
+        });
+
+        List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5);
+        List<String> lang = Arrays.asList(
+                "Java", "Scala", "Groovy", "Python", "Go", "Swift"
+        );
+
+        Stream<String> stream = lang.stream()
+                        .filter(langName -> langName.contains("a"));
 
         // [Go, Groovy, Java, Python, Scala, Swift]
         List<String> comp1 = lang.stream().sorted().collect(Collectors.toList());
