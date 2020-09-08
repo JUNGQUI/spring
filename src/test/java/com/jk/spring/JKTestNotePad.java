@@ -97,6 +97,21 @@ public class JKTestNotePad {
                 "Java", "Scala", "Groovy", "Python", "Go", "Swift"
         );
 
+        Optional<String> langFirst = lang.stream()
+                // a 가 포함되어 있지 않으면 다음 요소를 진행
+                // java 가 포함되어 있으므로 map 으로 이동
+                .filter(el -> {
+                    System.out.println("filter() was called.");
+                    return el.contains("a");
+                })
+                // java 를 upper case 로 만들고 return
+                .map(el -> {
+                    System.out.println("map() was called.");
+                    return el.toUpperCase();
+                })
+                // find first 이므로 첫 요소를 가져오고 반환, stream 종료
+                .findFirst();
+
         Stream<String> stream = lang.stream()
                         .filter(langName -> langName.contains("a"));
 
