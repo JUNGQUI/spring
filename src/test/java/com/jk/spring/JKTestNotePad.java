@@ -60,6 +60,9 @@ public class JKTestNotePad {
         // [1, 2, 3, 4]
         IntStream intStream = IntStream.range(1, 5);
 
+        intStream.forEach(System.out::println);
+        intStream.sorted();
+
         // [1, 2, 3, 4, 5]
         LongStream longStream = LongStream.rangeClosed(1, 5);
 
@@ -75,7 +78,19 @@ public class JKTestNotePad {
                     return element1 + element2;
                 });
 
-        int identityInteger = newintCollections.stream().reduce(
+        int identityInteger1 = newintCollections.stream().reduce(
+                10,
+                Integer::sum);
+
+        int identityInteger2 = newintCollections.stream().reduce(
+                10,
+                Integer::sum,
+                (element1, element2) -> {
+                    System.out.println(element1 + " + " + element2);
+                    return element1 + element2;
+                });
+
+        int identityInteger3 = newintCollections.parallelStream().reduce(
                 10,
                 Integer::sum,
                 (element1, element2) -> {
