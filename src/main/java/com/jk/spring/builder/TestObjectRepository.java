@@ -24,7 +24,7 @@ import java.util.List;
  * Isolation.SERIALIZABLE
  */
 
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
 public interface TestObjectRepository extends JpaRepository<TestObject, Long>, JpaSpecificationExecutor<TestObject> {
     List<TestObject> findByName(String name);
     List<TestObject> findByContentLike(String content);
