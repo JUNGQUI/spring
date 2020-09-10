@@ -1,4 +1,4 @@
-package com.jk.spring.JKStream;
+package com.jk.spring.jkStream;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.jk.spring;
 
-import com.jk.spring.JKStream.JKStreamObj;
+import com.jk.spring.jkStream.JKStreamObj;
 import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.finalAndStatic.JKStaticMethod;
 import com.jk.spring.lambda.JKLambda;
