@@ -120,4 +120,10 @@ public class ApplicationTests {
         int result = 0;
         System.out.println("J Tag");
     }
+
+    @Test
+    public void typeSafeTest() {
+//        System.out.println(1+"1");
+//        System.out.println("It Must Print 4 time " * 4);
+    }
 }
