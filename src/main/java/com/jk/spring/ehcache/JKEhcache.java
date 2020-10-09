@@ -1,5 +1,6 @@
 package com.jk.spring.ehcache;
 
+import com.jk.spring.builder.TestObject;
 import com.jk.spring.builder.TestObjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.EnableCaching;
@@ -17,7 +18,7 @@ public class JKEhcache {
 	@GetMapping(value = "/cache/{name}")
 	public void ehcache(@PathVariable(value = "name") String name) {
 		long startTime = System.currentTimeMillis();
-		testObjectRepository.findByNameCache(name);
+		TestObject testObject = testObjectRepository.findByNameCache(name);
 		long endTime = System.currentTimeMillis();
 		System.out.println(name + " printed, " + (endTime - startTime));
 	}
@@ -25,7 +26,7 @@ public class JKEhcache {
 	@GetMapping(value = "/nocache/{name}")
 	public void noEhcache(@PathVariable(value = "name") String name) {
 		long startTime = System.currentTimeMillis();
-		testObjectRepository.findByNameNoCache(name);
+		TestObject testObject = testObjectRepository.findByNameNoCache(name);
 		long endTime = System.currentTimeMillis();
 		System.out.println(name + " printed, " + (endTime - startTime));
 	}

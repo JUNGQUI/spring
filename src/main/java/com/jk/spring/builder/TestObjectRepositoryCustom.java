@@ -1,7 +1,7 @@
 package com.jk.spring.builder;
 
 public interface TestObjectRepositoryCustom {
-	void findByNameNoCache(String name);
-	void findByNameCache(String name);
+	TestObject findByNameNoCache(String name);
+	TestObject findByNameCache(String name);
 	void refresh(String name);
 }

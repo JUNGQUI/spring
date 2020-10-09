@@ -1,5 +1,6 @@
 package com.jk.spring.builder;
 
+import java.util.Date;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
@@ -8,14 +9,22 @@ import org.springframework.stereotype.Repository;
 public class TestObjectRepositoryCustomImpl implements TestObjectRepositoryCustom {
 
 	@Override
-	public void findByNameNoCache(String name) {
+	public TestObject findByNameNoCache(String name) {
 		slowQuery();
+		return TestObject.builder()
+				.name(name)
+				.createdDate(new Date())
+				.build();
 	}
 
 	@Override
 	@Cacheable(value = "sampleCache1", key="#name")
-	public void findByNameCache(String name) {
+	public TestObject findByNameCache(String name) {
 		slowQuery();
+		return TestObject.builder()
+				.name(name)
+				.createdDate(new Date())
+				.build();
 	}
 
 	@Override
