@@ -54,6 +54,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.querydsl/querydsl-apt
     compile group: 'com.querydsl', name: 'querydsl-apt', version: '4.4.0'
 
+    compile('org.springframework.boot:spring-boot-starter-cache')
+    // https://mvnrepository.com/artifact/org.ehcache/ehcache
+    compile group: 'org.ehcache', name: 'ehcache', version: '3.9.0'
+
 }
 
 //querydsl 추가 시작

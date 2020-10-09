@@ -25,7 +25,7 @@ import java.util.List;
  */
 
 @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.READ_COMMITTED)
-public interface TestObjectRepository extends JpaRepository<TestObject, Long>, JpaSpecificationExecutor<TestObject> {
+public interface TestObjectRepository extends JpaRepository<TestObject, Long>, TestObjectRepositoryCustom, JpaSpecificationExecutor<TestObject> {
     List<TestObject> findByName(String name);
     List<TestObject> findByContentLike(String content);
 }
