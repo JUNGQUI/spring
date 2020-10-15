@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class JKTestNotePad {
 
-    @Test
+//    @Test
     public void finalAndStaticTest() {
         FinalAndStatic finalAndStatic = new FinalAndStatic();
 
@@ -38,7 +38,7 @@ public class JKTestNotePad {
         JKStaticMethod.staticMethod();
     }
 
-    @Test
+//    @Test
     public void JKStream() {
         List<JKStreamObj> jkStreamObjs = new ArrayList<>();
 
@@ -152,7 +152,7 @@ public class JKTestNotePad {
         System.out.println("J Tag");
     }
 
-    @Test
+//    @Test
     public void lambdaTest() {
         List<String> list=new ArrayList<>();
         list.add("1");
@@ -189,7 +189,7 @@ public class JKTestNotePad {
         System.out.println("J Tag");
     }
 
-    @Test
+//    @Test
     public synchronized void threadTest() {
         try {
             JKLock jkLock = new JKLock();

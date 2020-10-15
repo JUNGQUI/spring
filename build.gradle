@@ -16,6 +16,10 @@ configurations {
     }
 }
 
+ext {
+    queryDSLVersion = '4.4.0'
+}
+
 repositories {
     mavenCentral()
 }
@@ -50,9 +54,9 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
 
     // https://mvnrepository.com/artifact/com.querydsl/querydsl-jpa
-    compile group: 'com.querydsl', name: 'querydsl-jpa', version: '4.4.0'
+    compile group: 'com.querydsl', name: 'querydsl-jpa', version: queryDSLVersion
     // https://mvnrepository.com/artifact/com.querydsl/querydsl-apt
-    compile group: 'com.querydsl', name: 'querydsl-apt', version: '4.4.0'
+    compile group: 'com.querydsl', name: 'querydsl-apt', version: queryDSLVersion
 
     compile('org.springframework.boot:spring-boot-starter-cache')
     // https://mvnrepository.com/artifact/org.ehcache/ehcache
@@ -66,6 +70,7 @@ def querydslDir = "$buildDir/generated/querydsl"
 querydsl {
     jpa = true
     querydslSourcesDir = querydslDir
+    library = "com.querydsl:querydsl-apt:$queryDSLVersion"
 }
 
 sourceSets {
@@ -79,4 +84,7 @@ configurations {
 compileQuerydsl {
     options.annotationProcessorPath = configurations.querydsl
 }
+
+tasks.withType(JavaCompile) { options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir) }
+
 //querydsl 추가 끝
