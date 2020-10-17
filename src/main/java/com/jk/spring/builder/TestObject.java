@@ -18,16 +18,16 @@ import java.util.Date;
 @Table(name = "TEST_OBJ")
 public class TestObject {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String name;
 
     // lob 절 대 쓰 지 마
     // 뭔가 방법이 있을텐데, ResultSet extract 를 실패한다.
-//    @Lob
-//    @Column(columnDefinition = "text")
-    @Type(type = "text")
+    @Lob
+    @Column(columnDefinition = "text")
+//    @Type(type = "text")
     private String content;
 
     @Temporal(TemporalType.TIMESTAMP)
