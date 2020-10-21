@@ -3,6 +3,8 @@ package com.jk.spring;
 import com.jk.spring.builder.TestObject;
 import com.jk.spring.builder.TestObjectRepository;
 import com.jk.spring.queryDSL.QueryDSLTestObjectService;
+import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,11 +19,28 @@ public class QueryDSLTest {
 	@Autowired private TestObjectRepository testObjectRepository;
 
 	@Test
-	public void queryDSLTest() {
-		queryDSLTestObjectService.saveOrUpdate();
+	public void queryDSLTest() throws IllegalAccessException {
+//		queryDSLTestObjectService.saveOrUpdate();
+//
+//		List<TestObject> testObjectsJpaRepository = testObjectRepository.findAll();
+//		List<TestObject> testObjectsQueryDSL = queryDSLTestObjectService.queryDSLFetchMethod();
 
-		List<TestObject> testObjectsJpaRepository = testObjectRepository.findAll();
-		List<TestObject> testObjectsQueryDSL = queryDSLTestObjectService.queryDSLFetchMethod();
+		TestObject.class.getTypeName();
+		TestObject.class.getAnnotations();
+
+		TestObject testObject = TestObject.builder()
+				.id(1L)
+				.name("name")
+				.content("content")
+				.createdDate(new Date())
+				.updatedDate(null)
+				.build();
+
+		for (Field field : testObject.getClass().getDeclaredFields()) {
+			field.getAnnotatedType();
+			field.getType();
+			field.getDeclaredAnnotations();
+		}
 
 		System.out.println("J Tag");
 	}
