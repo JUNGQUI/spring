@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
@@ -35,6 +34,9 @@ public class TestObject {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private TestObjectForRelation testObjectForRelation;
 
     public void changeContent(String name, String content) {
         // 예외에 대한 처리 및 실제 변경의 logic 이 도메인 내에 존재
