@@ -1,7 +1,10 @@
 package com.jk.spring.controller;
 
+import com.jk.spring.builder.TestObject;
+import com.jk.spring.jkenum.JKEnum;
 import com.jk.spring.queryDSL.QueryDSLTestObjectService;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,9 +22,19 @@ public class TestController {
 		System.out.println("J Tag");
 	}
 
+	@GetMapping(value = "/test/all")
+	public List<TestObject> all() {
+		return queryDSLTestObjectService.listAll();
+	}
+
 	@GetMapping(value = "/test/init")
 	public void init() {
 		queryDSLTestObjectService.saveOrUpdate();
+	}
+
+	@GetMapping(value = "/test/initWithEnum")
+	public void initWithEnum(@RequestParam (value = "jkEnum") JKEnum jkEnum) {
+		queryDSLTestObjectService.saveWithEnum(jkEnum);
 	}
 	
 	@GetMapping(value = "/test/transaction")

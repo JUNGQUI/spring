@@ -3,6 +3,7 @@ package com.jk.spring.queryDSL;
 import com.jk.spring.builder.QTestObject;
 import com.jk.spring.builder.TestObject;
 import com.jk.spring.builder.TestObjectRepository;
+import com.jk.spring.jkenum.JKEnum;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.Date;
 import java.util.List;
@@ -21,11 +22,16 @@ public class QueryDSLTestObjectService {
 	private final TestObjectRepository testObjectRepository;
 
 	@Transactional
+	public List<TestObject> listAll() {
+		return testObjectRepository.findAll();
+	}
+
+	@Transactional
 	public void saveOrUpdate() {
 		testObjectRepository.saveAndFlush(
 				TestObject.builder()
 						.name("jk_1")
-						.content("contenst 1")
+						.content("content 1")
 						.createdDate(new Date())
 						.build()
 		);
@@ -33,8 +39,20 @@ public class QueryDSLTestObjectService {
 		testObjectRepository.saveAndFlush(
 				TestObject.builder()
 						.name("jk_2")
-						.content("contenst 2")
+						.content("content 2")
 						.createdDate(new Date())
+						.build()
+		);
+	}
+
+	@Transactional
+	public void saveWithEnum(JKEnum jkEnum) {
+		testObjectRepository.saveAndFlush(
+				TestObject.builder()
+						.name("jk_3")
+						.content("content 3")
+						.createdDate(new Date())
+						.jkEnum(jkEnum)
 						.build()
 		);
 	}
