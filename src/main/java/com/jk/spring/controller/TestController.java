@@ -65,7 +65,7 @@ public class TestController {
 		System.out.println("안됩니다.");
 	}
 
-	@GetMapping(value = "/test/request/param/post/object")
+	@PostMapping(value = "/test/request/param/post/object")
 	public void requestParamPostObjectTest(@RequestParam(value = "test") ControllerTestObj test) {
 		System.out.println("안됩니다.");
 	}
