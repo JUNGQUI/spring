@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,5 +48,35 @@ public class TestController {
 		queryDSLTestObjectService.testTransaction(id, name, content);
 		System.out.println(System.currentTimeMillis() - startTime);
 		System.out.println(startDate + " / " + LocalDateTime.now());
+	}
+
+	@GetMapping(value = "/test/request/param/get")
+	public void requestParamGetTest(@RequestParam(value = "test") String test) {
+		System.out.println(test);
+	}
+
+	@PostMapping(value = "/test/request/param/post")
+	public void requestParamPostTest(@RequestParam(value = "test") String test) {
+		System.out.println(test);
+	}
+
+	@GetMapping(value = "/test/request/param/get/object")
+	public void requestParamGetObjectTest(@RequestParam(value = "test") ControllerTestObj test) {
+		System.out.println("안됩니다.");
+	}
+
+	@GetMapping(value = "/test/request/param/post/object")
+	public void requestParamPostObjectTest(@RequestParam(value = "test") ControllerTestObj test) {
+		System.out.println("안됩니다.");
+	}
+
+	@GetMapping(value = "/test/request/body/get")
+	public void requestBodyGetTest(@RequestBody ControllerTestObj test) {
+		System.out.println(test);
+	}
+
+	@PostMapping(value = "/test/request/body/post")
+	public void requestBodyPostTest(@RequestBody ControllerTestObj test) {
+		System.out.println(test);
 	}
 }
