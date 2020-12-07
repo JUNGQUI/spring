@@ -6,6 +6,7 @@ import com.jk.spring.builder.TestObjectSpecs;
 import com.jk.spring.service.UseService;
 import org.apache.commons.lang3.time.FastDateFormat;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -125,5 +126,13 @@ public class ApplicationTests {
     public void typeSafeTest() {
 //        System.out.println(1+"1");
 //        System.out.println("It Must Print 4 time " * 4);
+    }
+
+    @Test
+    public void stringJoinTest() {
+        String[] word1 = new String[] {"a", "b", "c"};
+        String[] word2 = new String[] {"ab", "c"};
+
+        Assertions.assertTrue(String.join("", word1).equals(String.join("", word2)));
     }
 }
