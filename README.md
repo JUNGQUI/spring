@@ -13,3 +13,4 @@ spring boot (2.1) and spring framework study project
 - builder : builder pattern 을 이용해서 DAO 구성, 현재는 Local 에 만들었으나 추후 docker 를 이용해서 postgres 띄울 예정<br/>
 - lock : synchronized, ReentrantLock, NoneLock 구현체 -> test 는 JKTestNotepad 참고<br/>
 - time : JKTimeClass, LocalDate, LocalDateTime, Duration, Period 등 존재<br/>
+- interface : 인터페이스를 이용한 각종 방법론(?) <br/>
