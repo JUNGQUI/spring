@@ -40,16 +40,4 @@ public class JKMockTest {
 
         Assertions.assertThrows(RuntimeException.class, () -> lengthValidator.validator(name.toString()));
     }
-
-    @Test
-    @Description("길이 준수 모킹 파라미터")
-    public void mockingLengthExceptionNormal() {
-        // TODO implement
-    }
-
-    @Test
-    @Description("길이 초과 모킹 파라미터")
-    public void mockingLengthExceptionAbnormal() {
-        // TODO implement
-    }
 }
