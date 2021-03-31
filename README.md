@@ -14,3 +14,4 @@ spring boot (2.1) and spring framework study project
 - lock : synchronized, ReentrantLock, NoneLock 구현체 -> test 는 JKTestNotepad 참고<br/>
 - time : JKTimeClass, LocalDate, LocalDateTime, Duration, Period 등 존재<br/>
 - interface : 인터페이스를 이용한 각종 방법론(?) <br/>
+- mock : Mockito 관련 활용을 위한 package <br/>
