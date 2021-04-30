@@ -1,5 +1,5 @@
 # spring
-spring boot (2.1) and spring framework study project
+spring boot (2.1) 스터디 프로젝트
 
 # Package
 - service : 각종 interface 를 받아 사용하는 component package<br/>
