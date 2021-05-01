@@ -1,7 +1,9 @@
 package com.jk.spring.java.modern.part1.part1;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -45,5 +47,21 @@ class ComparisonAppleTest {
 
     a1.forEach(System.out::println);
     a2.forEach(System.out::println);
+  }
+
+  @Test
+  public void resultTest() {
+    System.out.println(test("a", (a) -> a += "function Processing"));
+  }
+
+  private String test(String a, Function<String, String> appendingFunction) {
+    return appendingFunction.apply(a + " test processing ");
+  }
+
+  public class StreamMapSum {
+    public void test() {
+      List<Integer> streams = Arrays.asList(1, 2, 3, 4, 5);
+      int resultOfSum = streams.stream().mapToInt(i -> i).sum();
+    }
   }
 }
