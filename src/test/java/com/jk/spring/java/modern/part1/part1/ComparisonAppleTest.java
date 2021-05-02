@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -84,5 +85,20 @@ class ComparisonAppleTest {
       Assertions.assertEquals(Color.GREEN, apple.getColor());
       System.out.println(apple.getColor() + " " + apple.getWeight());
     });
+  }
+
+  @Test
+  void collectionsAPITest() {
+    List<String> test = Arrays.asList("a", "b", "c");
+
+    for(String t : test) {
+      if (t.equals("a")) {
+        t += "1";
+      } else {
+        t += "2";
+      }
+    }
+
+    test.forEach(System.out::println);
   }
 }

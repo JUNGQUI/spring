@@ -139,3 +139,64 @@ public class Main {
 > 
 > 개념만 알고 넘어가도 되는것이 기본적으로 구현이 다 되어 있기에 자연스럽게 내부 구조에 대해 상세히 몰라도 사용이 가능하다.
 
+- 스트림
+
+스트림에 대해 진행하기 전에 구분을 해야 하는 것이 있는데 stream API 와 collection API 이다.
+
+- Collection API
+
+우리가 흔히 아는 for-each 문을 통한 반복 후 수행하는 작업에 대해 Collection API 라고 할 수 있고 가장 보편적으로 쓰였을 API 가 (아마도)
+`Arrays.asList` 일 것이다.
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class CollectionApi {
+
+  public void api() {
+    List<String> test = Arrays.asList("a", "b", "c");
+    List<String> result = new ArrayList<>();
+
+    for (String t : test) {
+      if (t.equals("a")) {
+        result.add(t + "1");
+      } else {
+        result.add(t + "2");
+      }
+    }
+  }
+}
+```
+
+위의 코드의 로직은 a 문자열은 1 을 붙이고 나머지는 2를 붙여서 새로운 결과로 반영하는 것이다. 크게 보자면 a인지 아닌지 구분하는 필터,
+실제 변화 로직을 수행하고 결과를 만드는 add 로 나뉘어져 있다.
+
+이러한 방식의 for-each 를 이용해서 구현하는 것을 외부 반복이라고 한다.
+
+반면 Stream API 로 해당 내역을 구현해보자.
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class CollectionApi {
+
+  public void api() {
+    List<String> test = Arrays.asList("a", "b", "c");
+    
+    test.forEach(t -> {
+      if (t.equal("a")) {
+        return t + "1";
+      }
+      return t + "2";
+    });
+  }
+}
+```
+
+test 자체를 수정하기에 이미 result 가 되어버린 셈이고 반복문 시 발생했던 새로운 string 인스턴스가 아닌 가지고 있는 값을 변경하기에
+메모리 소모도 적다.
+
+물론 이렇게 하는것이 기존의 원본 데이터를 훼손하는 것이기에 좋은 방법은 아니다. 그에 따라 `map() + collect(Collectors.toList())`
+를 이용해서 구현하는 방법도 있다.
