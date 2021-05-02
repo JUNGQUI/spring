@@ -9,4 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Apple {
   private int weight;
+  private Color color;
+
+  public static boolean isGreenApple(Apple apple) {
+    return Color.GREEN.equals(apple.getColor());
+  }
+
+  public static boolean isHeavyApple(Apple apple) {
+    return apple.getWeight() > 150;
+  }
 }

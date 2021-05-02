@@ -88,7 +88,7 @@ public class Apple {
   private Color color;
 
   public static boolean isGreenApple(Apple apple) {
-    return Color.GREEN.equals(apple);
+    return Color.GREEN.equals(apple.getColor());
   }
 
   public static boolean isHeavyApple(Apple apple) {
@@ -136,4 +136,6 @@ public class Main {
 > 
 > 체크할 점은 Function<Apple, Boolean> 과 같은 형식으로 Predicate 대신 Function 으로 구현해서 전달이 가능하나, boolean, Boolean
 > 형 변환도 할필요 없어서 효율적이기도 하며 가장 중요한 점은 이 Predicate 를 이용하는게 표준이다.
+> 
+> 개념만 알고 넘어가도 되는것이 기본적으로 구현이 다 되어 있기에 자연스럽게 내부 구조에 대해 상세히 몰라도 사용이 가능하다.
 

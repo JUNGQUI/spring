@@ -18,11 +18,14 @@ class ComparisonAppleTest {
   @Autowired
   private ComparisonApple comparisonApple;
 
+  @Autowired
+  private JKLambda jkLambda;
+
   @Test
   void comparison() {
-    Apple apple1 = new Apple(1);
-    Apple apple2 = new Apple(2);
-    Apple apple3 = new Apple(3);
+    Apple apple1 = new Apple(1, Color.GREEN);
+    Apple apple2 = new Apple(2, Color.GREEN);
+    Apple apple3 = new Apple(3, Color.GREEN);
 
     List<Apple> a1 = new ArrayList<>();
     List<Apple> a2 = new ArrayList<>();
@@ -58,10 +61,28 @@ class ComparisonAppleTest {
     return appendingFunction.apply(a + " test processing ");
   }
 
-  public class StreamMapSum {
-    public void test() {
-      List<Integer> streams = Arrays.asList(1, 2, 3, 4, 5);
-      int resultOfSum = streams.stream().mapToInt(i -> i).sum();
-    }
+  @Test
+  void lambdaTest() {
+    List<Apple> inventory = Arrays.asList(
+        new Apple(150, Color.GREEN),
+        new Apple(155, Color.GREEN),
+        new Apple(160, Color.RED)
+    );
+
+    List<Apple> filteredInventoryWeight = new ArrayList<>();
+    List<Apple> filteredInventoryColor = new ArrayList<>();
+
+    filteredInventoryWeight = jkLambda.filterApples(inventory, Apple::isHeavyApple);
+    filteredInventoryColor = jkLambda.filterApples(inventory, Apple::isGreenApple);
+
+    filteredInventoryWeight.forEach(apple -> {
+      Assertions.assertTrue((apple.getWeight() > 150));
+      System.out.println(apple.getColor() + " " + apple.getWeight());
+    });
+
+    filteredInventoryColor.forEach(apple -> {
+      Assertions.assertEquals(Color.GREEN, apple.getColor());
+      System.out.println(apple.getColor() + " " + apple.getWeight());
+    });
   }
 }
