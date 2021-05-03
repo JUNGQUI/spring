@@ -22,7 +22,7 @@
 > 쉽게 이야기 하면 side-effect 가 일어나지 않게 하되 내부 로직은 오롯이 정해진 로직만을 수행하게끔 해야 하며
 > 다른 로직이 수행될 여지조차 없게 파라미터가 다른 멤버 변수가 없게 만들어야 함을 이른다.
 
-- 람다
+- 람다 (Lambda)
 
 가장 대표적인 함수형 표현이라고 볼 수 있다.
 
@@ -139,7 +139,7 @@ public class Main {
 > 
 > 개념만 알고 넘어가도 되는것이 기본적으로 구현이 다 되어 있기에 자연스럽게 내부 구조에 대해 상세히 몰라도 사용이 가능하다.
 
-- 스트림
+- 스트림 (Stream)
 
 스트림에 대해 진행하기 전에 구분을 해야 하는 것이 있는데 stream API 와 collection API 이다.
 
@@ -200,3 +200,57 @@ test 자체를 수정하기에 이미 result 가 되어버린 셈이고 반복�
 
 물론 이렇게 하는것이 기존의 원본 데이터를 훼손하는 것이기에 좋은 방법은 아니다. 그에 따라 `map() + collect(Collectors.toList())`
 를 이용해서 구현하는 방법도 있다.
+
+- 디폴트 메소드 (default method)
+
+자바 8 이전에 있는 인터페이스에 대해서 업그레이드 하는 것은 몹시 고통스러운 일이였는데, 그 이유로는 인터페이스 업그레이드가 인터페이스를
+구현하는 모든 클래스에 영향을 끼치기 때문이다.
+
+위의 `Apple` 을 이용해서 간단한 예를 하나 들어보자.
+
+```java
+import java.util.ArrayList;
+
+public class DefaultMethod {
+
+  public void defaultMethodTest() {
+    List<Apple> inventory = new ArrayList<>();
+    // ... apple 추가 작업
+    List<Apple> heavy1 = inventory.stream()
+        .filter(a -> a.getWeight() > 150)
+        .collect(Collectors.toList());
+
+    List<Apple> heavy2 = inventory.parallelStream()
+        .filter(a -> a.getWeight() > 150)
+        .collect(Collectors.toList());
+  }
+}
+```
+
+위 코드는 자바 8 이전의 버전에서는 구현이 되지 않을 것이다. 기본적으로 stream(), parallelStream() 이 존재하지 않기 떄문인데,
+이를 자바 8 이전에서도 정상적으로 동작하게 만들기 위해서는 Collection 인터페이스에 해당 method 를 추가하는 것이다.
+
+결과적으로 이러한 부분들을 해결하기 위해 default method 가 추가되었다.
+
+```java
+public interface List {
+  // ...
+  default void sort(Comparator<? super E> c) {
+    Collections.sort(this, c);
+  }
+  // ...
+}
+```
+
+위와 같이 자파 8 이후부터 list 에서 sort 가 default method 로 구현이 되었는데 이를 통해 직접 Collection 에서 `sort` 사용이 가능하며
+내부에는 정적 Collections class 를 이용해서 소팅해주는 역할을 수행한다.
+
+즉, 쉽게 말해 default method 의 경우 인터페이스 내에 한꺼풀 wraping 되서 새로 선언된 메서드이기에 구현이 이미 된 method 를 그대로 사용이
+가능하다는 의미이다. (자세한 내역은 추후에 다룬다)
+
+- Optional
+
+많은 사람들이 무서워하는 NPE 를 회피 할 수 있게 만들어진 클래스이다.
+
+기본적으로 `Optional.get().orElse()` 와 같은 방식으로 사용이 가능하며 null 이 반환되었을 경우 특정한 값을 받게(혹은 다른 로직을 수행하게)
+하여 NPE 에 대해 해당 layer 에서 처리가 가능하게 만들어준다.
