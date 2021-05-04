@@ -1,10 +1,13 @@
-package com.jk.spring.java.modern.part1.part1;
+package com.jk.spring.java.modern.chapter1.part1;
 
+import com.jk.spring.java.modern.chapter1.Apple;
+import com.jk.spring.java.modern.chapter1.Color;
+import com.jk.spring.java.modern.chapter1.ComparisonApple;
+import com.jk.spring.java.modern.chapter1.JKLambda;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;

@@ -1,9 +1,8 @@
-package com.jk.spring.java.modern.part1.part1;
+package com.jk.spring.java.modern.chapter1;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Component;
 
 @Component

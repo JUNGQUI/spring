@@ -1,4 +1,4 @@
-package com.jk.spring.java.modern.part1.part1;
+package com.jk.spring.java.modern.chapter1;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

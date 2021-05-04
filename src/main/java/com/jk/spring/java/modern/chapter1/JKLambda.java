@@ -1,4 +1,4 @@
-package com.jk.spring.java.modern.part1.part1;
+package com.jk.spring.java.modern.chapter1;
 
 import java.util.ArrayList;
 import java.util.List;
