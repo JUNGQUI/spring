@@ -217,5 +217,73 @@ public class FilterLambdaUse {
 
 - 리스트 추상화
 
-마찬가지로 위의 항목을 List 형식으로 추상화 할 경우 필요한 필터를 그때 그때 추가하여 한번에 중첩 필터를 만들 수 있다.
+마찬가지로 위의 항목을 T 형식으로 추상화 할 경우 필요한 필터를 그때 그때 추가하여 한번에 중첩 필터를 만들 수 있다.
 
+```java
+@UtilityClass
+public class FilterT {
+  public <T> List<T> filter(List<T> list, Predicate<T> p) {
+    List<T> result = new ArrayList<>();
+    list.forEach(t -> {
+      if (p.test(t)) {
+        result.add(t);
+      }
+    });
+
+    return result;
+  }
+}
+```
+
+이와 같이 T type 으로 추상화하고 사용 할 경우 Apple 뿐 아니라 다양한 class 에 대해서 predicate 를 사용해서
+필터링이 가능하다. T 또한 동적 파라미터화한것이고 predicate 또한 lambda 형식으로 매 필터 지정 시 구현을 하면 동적으로 그때 그때
+구현이 가능해진다.
+
+- Runnable, Callable
+
+위와 마찬가지로 Runnable Callable 을 상속받아서 다양한 동작을 동적으로 할당이 가능하다.
+
+```java
+public class JKRunnable {
+
+  public void runnableTest() {
+    Thread t = new Thread(new Runnable() {
+      @Override
+      public void run() {
+        // SOME LOGIC
+      }
+    });
+
+    Thread lambdaT = new Thread(() -> {
+      // SOME LOGIC
+    });
+  }
+}
+```
+
+```java
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public interface Callable<V> {
+
+  V call();
+}
+
+public class JKCallable {
+
+  public void callableTest() {
+    ExecutorService executorService = Executors.newSingleThreadExecutor();
+    Future<String> threadName = executorService.submit(new Callable<String>() {
+      @Override
+      public String call() throws Exception {
+        return Thread.currentThread().getName();
+      }
+    });
+
+    Future<String> lambdaThreadName = executorService
+        .submit((Callable<String>) () -> Thread.currentThread().getName());
+  }
+}
+```

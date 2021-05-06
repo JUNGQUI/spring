@@ -1,4 +1,4 @@
-package com.jk.spring.java.modern.chapter1.part1;
+package com.jk.spring.java.modern.chapter1;
 
 import com.jk.spring.java.modern.chapter1.Apple;
 import com.jk.spring.java.modern.chapter1.Color;

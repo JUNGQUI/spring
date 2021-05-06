@@ -45,4 +45,24 @@ class ApplePredicateTest {
       Assertions.assertEquals(startWithA.get(i), startWithALambda.get(i));
     }
   }
+
+  @Test
+  void appleAndTPredicateTest() {
+    List<Apple> inventory = Arrays.asList(
+        new Apple(125, Color.GREEN),
+        new Apple(155, Color.GREEN),
+        new Apple(170, Color.RED)
+    );
+
+    List<String> stringInventory = Arrays.asList("a", "ab", "cb", "bd", "ce");
+    List<String> startWithALambda = FilterT.filter(stringInventory, (s -> s.startsWith("a")));
+
+    startWithALambda.forEach(s -> Assertions.assertTrue(s.startsWith("a")));
+
+    List<Apple> heavyApples = FilterT.filter(inventory, apple -> apple.getWeight() > 150);
+    List<Apple> greenApples = FilterT.filter(inventory, apple -> Color.GREEN.equals(apple.getColor()));
+
+    heavyApples.forEach(heavyApple -> Assertions.assertTrue(heavyApple.getWeight() > 150));
+    greenApples.forEach(greenApple -> Assertions.assertEquals(Color.GREEN, greenApple.getColor()));
+  }
 }
