@@ -32,3 +32,93 @@ public class JKGeneric {
 
 이처럼 `FilterT.filter` 를 이용해서 접근하고 Predicate 도 람다형식으로 동일하게 제공하지만 `startWithALambda` 의 경우 
 `String`, 나머지는 `Apple` 객체를 필터링하는데 사용하고 있다.
+
+Generic 을 통해 구현하는 방법에는 크게 3가지 용법이 있다.
+
+- Class
+
+```java
+public class JKGeneric<T> {
+  private T t;
+  
+  public void setT(T t) {
+    this.t = t;
+  }
+  
+  public T getT() {
+    return this.t;
+  }
+}
+```
+
+- Interface
+  
+```java
+public interface JKGenericInterface<T> {
+  T someMethod(T t);
+}
+
+public interface JKGenericBiInterface <T1, T2> {
+  T1 firstMethod(T1 t1);
+  T2 secondMethod(T2 t2);
+}
+
+public class JKGenericClassString implements JKGenericInterface<String> {
+  @Override
+  public String someMethod(String string) {
+    return "called by method " + string;
+  }
+}
+
+public class JKGenericClassInteger implements JKGenericInterface<Integer> {
+  @Override
+  public Integer someMethod(Integer integer) {
+    return integer + 1;
+  }
+}
+```
+
+- method
+
+```java
+public class JKGenericMethod {
+  public <T> int genericMethod(T[] list, T item) {
+    int count = 0;
+    
+    for (T t : list) {
+      if (item == t) {
+        count++;
+      }
+    }
+    return count;
+  }
+}
+```
+
+- wildcard
+
+```java
+class WildcardGenericType {
+  
+  public List<? extends Number> method1() {
+    return new ArrayList<Long>();
+  }
+  
+  public <T> List<? extends String> method2(T param) {
+    return new ArrayList<String>();
+  }
+  
+  public List<?> method3() {
+    return new ArrayList<>();
+  }
+}
+```
+
+> 참고
+> ```text
+> E - Element
+> K - Key
+> N - Number
+> T - Type
+> V - Value
+> ```
