@@ -1,4 +1,4 @@
-package com.jk.spring.java.modern.chapter2;
+package com.jk.spring.java.modern.chapter3;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
