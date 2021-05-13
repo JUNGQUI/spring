@@ -54,7 +54,7 @@ public class StreamTest() {
 
 - 동작 파라미터화
 
-쉽게 말해, 함수를 파라미터처럼 만들어서 동작하는 코드 자체를 메소드에 전달 할 수 있는 것이다.
+쉽게 말해, 함수를 파라미터처럼 만들어서 동작하는 코드 자체를 메서드에 전달 할 수 있는 것이다.
 
 ```java
 public class BehaviorParameterization {
@@ -92,7 +92,7 @@ public class BehaviorParameterization {
 >     // int resultOfSum = 0;
 >     // streams.forEach(i -> resultOfSum+=i); // 이 부분에서 resultOfSum 은 외부이고, 해당 내역은 불변으로써 진행되어야 함
 >     int resultOfSum = streams.stream().mapToInt(i -> i).sum();
->     // IntStream 으로 변환하고 전체의 합이기에 sum() 이라는 메소드를 통해 합친다.
+>     // IntStream 으로 변환하고 전체의 합이기에 sum() 이라는 메서드를 통해 합친다.
 >   }
 > }
 > ```

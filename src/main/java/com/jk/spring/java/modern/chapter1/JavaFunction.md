@@ -201,7 +201,7 @@ test 자체를 수정하기에 이미 result 가 되어버린 셈이고 반복�
 물론 이렇게 하는것이 기존의 원본 데이터를 훼손하는 것이기에 좋은 방법은 아니다. 그에 따라 `map() + collect(Collectors.toList())`
 를 이용해서 구현하는 방법도 있다.
 
-- 디폴트 메소드 (default method)
+- 디폴트 메서드 (default method)
 
 자바 8 이전에 있는 인터페이스에 대해서 업그레이드 하는 것은 몹시 고통스러운 일이였는데, 그 이유로는 인터페이스 업그레이드가 인터페이스를
 구현하는 모든 클래스에 영향을 끼치기 때문이다.
@@ -245,7 +245,7 @@ public interface List {
 위와 같이 자파 8 이후부터 list 에서 sort 가 default method 로 구현이 되었는데 이를 통해 직접 Collection 에서 `sort` 사용이 가능하며
 내부에는 정적 Collections class 를 이용해서 소팅해주는 역할을 수행한다.
 
-즉, 쉽게 말해 default method 의 경우 인터페이스 내에 한꺼풀 wraping 되서 새로 선언된 메서드이기에 구현이 이미 된 method 를 그대로 사용이
+즉, 쉽게 말해 default method 의 경우 인터페이스 내에 한꺼풀 wrapping 되서 새로 선언된 메서드이기에 구현이 이미 된 method 를 그대로 사용이
 가능하다는 의미이다. (자세한 내역은 추후에 다룬다)
 
 - Optional
