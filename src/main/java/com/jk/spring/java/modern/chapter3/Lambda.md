@@ -177,3 +177,60 @@ public class UseExampleClass {
 > 
 > 만약 해당 어노테이션이 붙어있음에도 불구하고 메서드가 2개 이상 있을 경우 익셉션이 발생한다.
 
+- 람다 활용 요소 : 실행 어라운드 패턴
+
+Aspect 를 알고 있는가? 어떤 특정한 시점을 지정하여 thread 가 인터셉트 당해(?) 어떤 작업을 수행하과 기존 로직을
+수행하는 기능을 의미한다.
+
+실행 어라운드 패턴도 이와 동일하다. 어떤 작업 (A, B 아니면 C 등)들이 있는데, 이 작업을 수행하기 전 똑같이 `초기화 및 준비 - 작업 - 정리, 마무리` 와 같은
+패턴을 가질때 이러환 환경을 실행 어라운드 패턴 이라고 한다.
+
+람다를 사용해서 이와 같은 부분들을 쉽게 구현이 가능하다.
+
+이와 같은 코드가 있다고 가정하자.
+
+```java
+import java.io.BufferedReader;
+
+public class ExecuteAroundPattern {
+
+  public String processFile() throws IOException {
+    try (BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
+      return br.readLine();
+    }
+  }
+}
+```
+
+위 함수를 실행하면 한 줄씩 읽게 된다. 그런데 이 부분이 두줄, 세줄, 혹은 줄을 읽고 별도의 작업을 수행한다고 가정한다면 많은 부분을 수정해야 한다.
+
+그 상태에서 다시 이전의 1줄도 필요하다고 가정을 해보자. (즉 두 메서드가 동시에 필요하다)
+
+이럴 경우 br.readLine 을 람다로 구현이 가능하다.
+
+```java
+import java.io.IOException;
+
+public interface BufferedReaderProcessor {
+
+  String process(BufferedReader b) throws IOException;
+}
+
+public class ExecuteAroundPatter {
+  public String processFile(BufferedReaderProcessor p) throws IOException {
+    try (BufferedReader br = new BufferedReader(new FileReader("data.txt"))) {
+      return p.process(br);
+    }
+  }
+
+  public void usingWithLambda() throws IOException {
+    String oneLine = processFile(BufferedReader::readLine);
+    String secondLine = processFile((BufferedReader br) -> br.readLine() + br.readLine());
+
+    System.out.println(oneLine);
+    System.out.println(secondLine);
+  }
+}
+```
+
+위와 같이 람다를 이용해서 그때 그때 함수형 인터페이스에 메서드를 구현해서 넣어주면 그대로 실행이 가능해진다.
