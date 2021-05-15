@@ -234,3 +234,116 @@ public class ExecuteAroundPatter {
 ```
 
 위와 같이 람다를 이용해서 그때 그때 함수형 인터페이스에 메서드를 구현해서 넣어주면 그대로 실행이 가능해진다.
+
+- Consumer
+
+T 객체를 받아서 void 를 반환하는 accept 라는 메서드가 정의되어 있다.
+
+```java
+@FunctionalInterface
+public interface Consumer<T> {
+  void accept(T t);
+}
+```
+
+이러한 부분이 보통 어느 형식으로 쓰이냐면 Stream API 의 forEach 에서 쓰이곤 한다.
+
+```java
+public class JKConsumer {
+  public void main(List<String> someStrings) {
+    someStrings.forEach(s -> System.out.println(s));
+  }
+}
+```
+
+특징은 앞서 말한것처럼 T 객체를 받되 아무런 값을 리턴하지 않기에 보통 list 의 filter, list 를 순회하며 어떠한 변경 작업 등에서
+사용된다.
+
+- Function
+
+Consumer 와는 비슷하면서 반대인 이 개념은 T 객체를 받고 R 객체를 반환하는 추상 메서드 apply 를 제공한다.
+
+즉 어떠한 값이 주어지면 로직을 수행후 수행된 로직을 전달하는 것이 가능하다.
+
+```java
+public class JKFunction {
+  public void main(List<String> someStrings) {
+    List<String> editedSomeStrings = someStrings.stream()
+        .map(s -> s + " edited by function in map method")
+        .collect(Collectors.toList());
+  }
+}
+```
+
+> reference type
+> 
+> Consumer<T> 나 Function<T, R> 의 경우 파라미터를 제네릭 타입을 사용하게 되는데 제네릭 타입의 내부 구현 때문에 
+> 어쩔수 없이 참조형(reference type) 밖에는 사용 할 수 없다. 
+> 
+> ex) int -> primitive type / Integer -> reference type
+
+- 메서드 참조
+
+:: 콜론 두 개가 붙은 형식을 본적 있는가? 그게 바로 메서드 참조이다. 이게 중요한 이유는 당연하게도 가독성때문이다.(그리고 배워야 하는 이유이기도 하다)
+
+가장 대표적인 메서드 참조 방식이 `System.out.println` 이 있다.
+
+```java
+public class MethodReference {
+  public void printSomeString(List<String> someStrings) {
+    someStrings.forEach(System.out::println);
+  }
+}
+```
+
+위 메서드 참조는 forEach 를 통해 전달 받는 list 의 한 객체 string 을 출력하는 것이다.
+
+```java
+import java.util.List;
+
+public class ExampleOfMethodReference {
+
+  public void main() {
+    // ToIntFunction<String> stringToInt = (String s) -> Integer.parseInt(s);
+    ToIntFunction<String> stringToInt = Integer::parseInt;
+    // BiPredicate<List<String>, String> contains = (list, string) -> list.contains(string);
+    BiPredicate<List<String>, String> contains = List::contains;
+    // Predicate<String> startsWithNumber = (String string) -> this.startWithNumber(string);
+    Predicate<String> startsWithNumber = this::startWithNumber;
+  }
+}
+```
+
+- 생성자 메서드 참조
+
+생성자 또한 메서드 참조를 통해 생성이 가능하다. 가령 Apple 을 다시 한번 예를 들어보자.
+
+```java
+import com.jk.spring.java.modern.chapter1.Color;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Apple {
+
+  private Color color;
+  private int weight;
+}
+
+public class useConstructorMethodReference {
+
+  public void useCMR() {
+    Supplier<Apple> appleSupplier = Apple::new;
+    Apple emptyApple = appleSupplier.get(); // 빈 사과
+    
+    BiFunction<Color, Integer, Apple> allArguConstructorByBiFunction = Apple::new;
+    Apple apple = allArguConstructorByBiFunction.apply(Color.GREEN, 150); // 색이 GREEN, 무게가 150 인 사과
+  }
+}
+```
+
