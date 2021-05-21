@@ -3,10 +3,10 @@ package com.jk.spring.java.modern.chapter5;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +14,10 @@ class StreamMapTest {
   private final List<String> testCase = ImmutableList.of(
       "Hello", "World"
   );
+  private final List<Integer> integerTestCases = ImmutableList.of(
+      1, 2, 3, 4, 5
+  );
+  private final List<Integer> integerEmptyTestCases = Collections.emptyList();
 
   @Test
   void test1() {
@@ -39,5 +43,38 @@ class StreamMapTest {
             })
         )
         .collect(Collectors.toList());
+  }
+
+  @Test
+  void reduceTest() {
+    int result = 0;
+    for (int i : integerTestCases) {
+      result += i;
+    }
+
+    assertEquals(result, StreamReduce.addWithReduce(integerTestCases));
+  }
+
+  @Test
+  void reduceWithoutInitValueTest() {
+    int forLoopResult = 0;
+    for (int i : integerTestCases) {
+      forLoopResult += i;
+    }
+
+    Optional<Integer> optionalResult = StreamReduce.addWithReduceWithoutInitValue(integerTestCases);
+
+    int result = optionalResult.orElse(20);
+
+    assertEquals(forLoopResult, result);
+  }
+
+  @Test
+  void reduceWithoutInitValueNullTest() {
+    Optional<Integer> optionalResult = StreamReduce.addWithReduceWithoutInitValue(integerEmptyTestCases);
+
+    int result = optionalResult.orElse(20);
+
+    assertEquals(20, result);
   }
 }

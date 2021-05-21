@@ -182,3 +182,38 @@ public class StreamMap {
 > 
 > 이처럼 위의 match 와 관련된 메서드의 경우는 모두 쇼트 서킷 기법을 사용했다.
 
+### Reducing
+
+스트림에 대해 리듀싱 연산을 해주는 메서드를 리듀스 메서드라고 한다.
+
+> 리듀싱 연산
+> 
+> dish 를 예로 들 때 전체 메뉴 각각의 총 합을 구하시오 나 현재 메뉴 중 가장 칼로리가 높은 값은 과 같은 복합적인 질의에 대해
+> 스트림을 통해 연산을 하는 경우를 의미한다.
+> 
+> 보통 map 의 경우 결과값을 가지고 있고 (Object, Collection 등) forEach 의 경우 전체에 대해 어떠한 연산 (특정 조건 구분 없이)을
+> 수행하고 결과값은 void 로, 해당하는 값은 해당 스트림에 반영되는 식인 반면 리듀스 메서드는 결과값이 어떤 하나의 질의 결과로 떨어 질 수 있다.
+
+리듀스 메서드의 경우 파라미터로 이와 같이 받는다. `.reduce(INITIAL_VALUE, BUSINESS_LOGIC(FUNCTION))`
+
+```java
+public class StreamReduce {
+  public int addWithReduce(List<Integer> target) {
+    return target.stream()
+        // .reduce(0, (a, b) -> a + b);
+        .reduce(0, Integer::sum);
+  }
+
+  public Optional<Integer> addWithReduceWithoutInitValue(List<Integer> target) {
+    return target.stream().reduce(Integer::sum);
+  }
+}
+```
+
+위 함수를 보면 Integer collection 을 받아서 reduce 메서드를 통해 값을 계산해낸다.
+앞서 말했듯이 초기값으로 0을 주고 뒤에서는 계산하는 로직을 수행하는데 계산로직을 보면 값을 두개를 받게 되어있다. reduce 메서드의 두번째 파라미터로
+로직을 받을 수 있다고 했지만 실제론 BiFunction 을 받을 수 있고 그 뜻인 즉슨 최대 2개의 파라미터만 받는 로직을 수행하며
+마지막 1개의 요소가 남을때 까지 반복 작업을 수행한다.
+
+초기값이 없을 경우도 물론 가능한데, 초기값이 없기에 첫번째 요소를 초기값처럼 사용한다. 또한 만약에 첫번째요소조차 없다면 null 이 리턴될 수 있기에
+`Optional` 을 리턴 타입으로 받는다.
