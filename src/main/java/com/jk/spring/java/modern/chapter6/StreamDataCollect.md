@@ -29,6 +29,8 @@ public class CollectorReducing {
 
 이와 같이 collect 내에서는 toList 로 리스트형식 반환 뿐만 아니라 연산 또한 수행이 가능하다.
 
+### 분류 - groupingBy
+
 이중 분류 연산이 있는데 `groupingBy()` 라는 메서드를 써서 구현이 된다.
 
 ```java
@@ -90,4 +92,32 @@ public class GroupingDish {
 
 우선 필터 적용이 안된 스트림에서 타입별로 나누고 이후 filter 를 상속받은 filtering 을 통해서 그룹화를 **다시** 시도한다.
 
-이 **다시** 라는 것이 중요한데, 타입은 이미 정의가 되어 있기에 그 상태에서 filtering 에 전달된 로직에 맞춰 
+이 **다시** 라는 것이 중요한데, 타입은 이미 정의가 되어 있기에 그 상태에서 filtering 에 전달된 로직에 맞춰 현재의 스트림을 다시 필터링 해주게 된다.
+
+### 분할 - partitioningBy
+
+분할 메서드인 `partitioningBy()` 메서드의 장점은 참/거짓을 기준으로 분류는 하되 전체의 요소 데이터를 유지하는데에 있다.
+
+```java
+import com.jk.spring.java.modern.chapter4.Dish;
+
+public class PartitioningBy {
+
+  public void jkPartitioningBy(List<Dish> menus) {
+    menus.stream()
+        .paritioningBy(Dish::isVegetarian)
+        .groupingBy(Dish::getType)
+        .forEach(System.out::println);
+  }
+}
+```
+
+위와 같이 수행할 경우 결과는 아래와 같이 나타난다.
+
+```text
+{
+  false={FISH=[prawns, salmon}, MEAT=[pork, beef]}, ...}
+  , true={...}
+}
+```
+
