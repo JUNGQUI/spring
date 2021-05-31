@@ -10,7 +10,7 @@ class ForkJoinSumCalculatorTest {
 
   @Test
   void computeTest() {
-    long[] targets = LongStream.rangeClosed(1, 20_000).toArray();
+    long[] targets = LongStream.rangeClosed(1, 1000).toArray();
     ForkJoinSumCalculator forkJoinSumCalculator = new ForkJoinSumCalculator(targets);
     Long result = forkJoinSumCalculator.compute();
 
