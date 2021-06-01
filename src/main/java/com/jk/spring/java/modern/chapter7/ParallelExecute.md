@@ -105,3 +105,103 @@ public class ParallelStream {
 
 이름 그대로 반복적인 작업 방식으로 진행하는 것인데, 더 이상 나눌 수 없는 작업 단위까지 작업을 나누고 이후에 순차 진행하며 결과를
 조인하는 방식으로 진행된다.
+
+```java
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class ForkJoinSumCalculator extends RecursiveTask<Long> {
+
+  private final long[] numbers;
+  private final int start;
+  private final int end;
+
+  public static final long THRESHOLD = 10_000;
+
+  public ForkJoinSumCalculator(long[] numbers) {
+    this(numbers, 0, numbers.length);
+  }
+
+  @Override
+  protected Long compute() {
+    int length = end - start;
+
+    if (length <= THRESHOLD) {
+      return computeSequentially();
+    }
+    ForkJoinSumCalculator leftTask = new ForkJoinSumCalculator(numbers, start, start + length/2);
+    ForkJoinSumCalculator rightTask = new ForkJoinSumCalculator(numbers, start + length/2, end);
+    Long leftResult = leftTask.join();
+    Long rightResult = rightTask.join();
+    return leftResult + rightResult;
+  }
+
+  private long computeSequentially() {
+    long sum = 0;
+
+    for (int i = start; i < end; i++) {
+      sum += numbers[i];
+    }
+
+    return sum;
+  }
+
+}
+```
+
+위 코드를 보면 `RecursiveTask<T>` 를 상속받아서 `compute()` 메서드를 구현하는데 이 때 메서드 안에서 divide 작업을 진행한다.
+
+후에 join 을 통해서 결과를 합치고 마지막으로 최종 결과를 리턴하게 된다.
+
+> RecursiveTask
+> 
+> `join()` 메서드를 보아 알겠지만 RecursiveTask 는 ForkJoinTask 를, ForkJoinTask 는 Future 를 상위 클래스로 둔다.
+> 이렇게 비동기 요소를 이용해 구현을 했기에 각각의 task 를 임의로 분리하여 스레드 할당 후 병렬로 작업을 진행하게 할 수 있다.
+
+```java
+class ForkJoinSumCalculatorTest {
+
+  @Test
+  void computeTest() {
+    long[] targets = LongStream.rangeClosed(1, 10_000).toArray();
+    ForkJoinSumCalculator forkJoinSumCalculator = new ForkJoinSumCalculator(targets);
+
+    long startTime = System.currentTimeMillis();
+    Long result = new ForkJoinPool().invoke(forkJoinSumCalculator);
+    System.out.println(System.currentTimeMillis() - startTime);
+
+    startTime = System.currentTimeMillis();
+    Long resultByReduce = Arrays.stream(targets).reduce(0L, Long::sum);
+    System.out.println(System.currentTimeMillis() - startTime);
+
+    assertEquals(resultByReduce, result);
+  }
+}
+```
+
+실제로 사용을 해보면 생각보다 성능이 나오지 않는 이슈가 있는데 그 이유는 앞서 상황과 유사하게 long[] 을 이용하여 언박싱이 발생하였기 떄문이다.
+
+이 `RecursiveTask` 에서 주의해야 할 점이 몇 가지 있다.
+
+- 로직 : 앞서 말했듯이 병렬로 처리해도 되는지, 내부 비즈니스 로직이 과연 나누어서 진행하는게 옳은지에 대해 판단해야 한다.
+- fork + compute : 위를 예시로 들면 오른쪽, 왼쪽에 모두 fork/fork 를 하는게 더 이득으로 보이지만 한쪽에선 compute 를 호출하는데
+그 이유는 한쪽에서는 compute 를 호출 할 경우 해당 스레드에서는 같은 스레드를 재사용할 수 있게 되어 스레드 타스크 할당시 발생하는 오버헤드를 줄일 수 있다.
+- stack trace : 무릇 대다수의 병렬 작업의 디버깅이 그러하듯 ForkJoin 도 스택트레이스를 통해 디버깅하기 어렵다.
+
+마지막으로 누차 이야기 하지만 '무조건 병렬이 빠르다' 는 생각은 하면 안된다. 비즈니스 로직에 따라 순차 진행이 더 빠를 수 도 있고
+로직적으로 어쩔 수 없이 순차를 진행할 수 밖에 없는 경우도 생기기 마련이기에 작업에 대해 잘 가늠하고 진행해야 한다.
+
+### 작업 훔치기(work stealing)
+
+개발자가 아무리 태스크를 분리하고 적절하게 나눈다 하더라도 필시 어느 한 부분에선 스레드가 노는 현상이 발생 할 수 있다. 이러한 현상은
+컴퓨팅 환경에 따라 더욱 극명하게 나타난다. 예컨데 DB I/O 에 대해 잘 분리해서 작업을 하더라도 갑자기 예기치 못한 트래픽이 발생하여 대량의
+IO 가 발생 할 경우 연관되어 있는 작업에 대해서는 극단적으로 속도가 늦어 질 수 있다.
+
+이러한 부분을 개선하고자 포크/조인 프레임워크에서 `작업 훔치기` 라는 기법을 사용해서 처리한다.
+
+쉽게 이야기하면 할당된 태스크가 끝났을 경우 태스크가 쌓여있는 큐의 꼬리에서 작업을 훔쳐온다.
+
+큐라는 자료구조 상 뒤에 있는 작업은 현재 작업중인 스레드에서 관여할만한 포인트가 아니기에 다른 유휴 스레드에서 해당 태스크를 가져와서
+작업을 진행해도 무방하다.
+
+
+### Spliterator 인터페이스
