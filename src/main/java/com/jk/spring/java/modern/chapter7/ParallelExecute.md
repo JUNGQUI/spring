@@ -207,3 +207,29 @@ IO 가 발생 할 경우 연관되어 있는 작업에 대해서는 극단적으
 ### Spliterator 인터페이스
 
 자바 8에서 나온 새로운 인터페이스로, split + iterator 즉, 분할할 수 있는 반복자 라는 의미이다.
+
+Iterator 가 붙어 있듯이 유사한 기능을 제공하는데, 병렬작업에 특화되어 있는 것이 특징이다.
+
+```java
+public interface Spliterator<T> {
+  boolean tryAdvance(Consumer<? super T> action);
+  Spliterator<T> trySplit();
+  long estimateSize();
+  int characteristics();
+}
+```
+
+Spliterator 인터페이스는 위와 같이 구성되어 있다.
+
+- tryAdvance : iterator 와 동작이 같음
+- trySplit : 앞서 이야기한 fork/join 과 유사하게 일부 요소를 분할 후 Spliterator 로 다시 생성
+- estimateSize : 계산할 요소의 개수
+- characteristics : 분할된 spliterator 의 특성에 대해 반환
+
+trySplit 의 경우 최초 spliterator 가 시도 시 1회 분할하여 총 2개의 spliterator 가 남게되지만, 이후부터 실행 시
+분할된 모든 spliterator 에서 다시 한번 split 을 시도한다.
+
+즉 최초 1 -> 2 -> 4 -> 8 ... 와 같은 형식으로 분할이 된다. 다만 더 이상 분할 할 수 없으면 trySplit 은 null, 즉 더 이상 분할되지 않는다.
+
+한마디로 spliterator 는 stream 을 만들때 그 특성에 대해 정의해주어 해당 stream 의 연산 시 이러한 방식으로 연산하라 라는 메타값 혹은 설정 값이라고 볼 수 있다.
+
