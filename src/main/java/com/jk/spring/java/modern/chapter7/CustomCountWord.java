@@ -6,8 +6,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class CustomCountWord {
   public int countWordsIteratively(String s) {
-    int counter = 0;
-    boolean lastSpace = true;
+    var counter = 0;
+    var lastSpace = true;
 
     for (char c : s.toCharArray()) {
       if (Character.isWhitespace(c)) {
@@ -22,7 +22,7 @@ public class CustomCountWord {
   }
 
   public int countWordsByStream(Stream<Character> stream) {
-    WordCounter wordCounter = stream.reduce(new WordCounter(0, true),
+    var wordCounter = stream.reduce(new WordCounter(0, true),
         WordCounter::accumulate, WordCounter::combine);
 
     return wordCounter.getCounter();
