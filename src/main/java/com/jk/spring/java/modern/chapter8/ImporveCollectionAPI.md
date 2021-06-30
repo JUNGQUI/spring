@@ -164,4 +164,32 @@ public class ReplaceIterate {
 }
 ```
 
+### 정렬
 
+Map 컬렉션에서 key 값이나 value 값으로 정렬도 가능하다.
+
+```java
+public class CollectionFactory {
+  public Map<String, String> getFavouriteMovies() {
+    return Map.of(
+        "Raphael", "Star Wars"
+        , "Cristina", "Matrix"
+        , "Olivia", "James Bond"
+    );
+  }
+
+  public List<Entry<String, String>> sortedASCByEditor() {
+    return getFavouriteMovies().entrySet()
+        .stream()
+        .sorted(Entry.comparingByKey(String::compareTo))
+        // 동일한 코드
+//        .sorted(Entry.comparingByKey((s1, s2) -> {
+//          return s1.compareTo(s2);
+//        }))
+        .collect(Collectors.toList());
+  }
+}
+```
+
+`Entry.comparingByKey` 메서드를 이용해서 (물론 그 전에 키셋을 만들어야겠지만) 키를 값으로 정렬이 가능하다. `map` 메서드 를
+이용해서 정렬된 엔트리셋을 통해 셋이나 새로운 오브젝트 컬렉션으로 만들 수 있다.
