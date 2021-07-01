@@ -15,4 +15,9 @@ spring boot (2.1) 스터디 프로젝트
 - time : JKTimeClass, LocalDate, LocalDateTime, Duration, Period 등 존재<br/>
 - interface : 인터페이스를 이용한 각종 방법론(?) <br/>
 - mock : Mockito 관련 활용을 위한 package <br/>
-- resolver : spring resolver 및 resolver 개념 (ing)<br/>
+- resolver : spring resolver 및 resolver 개념<br/>
+
+# java package
+
+- modern : 모던 자바 인 액션<br/>
+- effective : 이펙티브 자바 (예정)<br/>
