@@ -215,3 +215,97 @@ public class CaloricDish {
 > 
 > 반면에 스트림 API 를 이용할 경우 파이프라인 형식으로 구현해 각 스텝별로 쉽게 구분이 가능하고 lazy 연산을 통해 조건 불충족 시 다음 단계로 넘어가는 대신
 > 해당 요소에 대한 연산을 중지하고 다음 요소에 대한 연산을 진행하여 효율적으로 순회가 가능하다.
+
+---
+- 코드 유연성 개선
+
+1. 함수형 인터페이스 적용
+
+람다를 이용 할 경우 함수형 인터페이스를 적용해서 사용하는 케이스가 많다. 이런 함수형 인터페이스의 경우 추상적으로 표현되어 있기 때문에 상황에 따라 유동적으로
+적용되는 함수를 변경해서 사용이 가능하다.
+
+가장 큰 예시는 바로 `Predicate` 인데, 어떤 람다에서 인자로 `Predicate` 를 받으면 Predicate 구현체에 따라 다른 필터링 연산이 가능하다.
+이와 같이 함수형 인터페이스를 적용하면 코드 유연성이 크게 개선된다.
+
+2. 조건부 연기 실행
+
+```java
+public class LogForSomething {
+  public void logForSomething() {
+    if (logger.isLoggable(Log.FINER)) {
+      logger.finer("Problem: " + generateDiagnostic());
+    }
+  }
+}
+```
+
+이러한 코드가 있다고 가정 할 때, 조건을 따져가며 로그를 기록하는 경우 코드 가독성을 떨어뜨리고 `isLoggable` 이란 메서드에 의해 현재의 로그 상태가
+클라이언트 코드로 노출이 되는 단점이 있다.
+
+```java
+public class LogForSomething {
+  public void logForSomething() {
+    logger.log(Level.FINER, "Problem : " + generateDiagnostic());
+  }
+}
+```
+
+이렇게 할 경우 현재 로그의 상태가 노출되지 않고 로그 기록이 가능하다. 다만 이렇게 할 경우 로그 메시지가 항상 노출되어 있는 부분이 이슈가 된다.
+
+이러한 이슈는 람다로 구현이 가능하다.
+
+```java
+public class LogForSomething {
+  public void log(Level level, Supplier<String> msgSupplier) {
+    if (logger.isLooggable(level)) {
+      log(level, msgSupplier.get());
+    }
+  }
+  
+  public void logForSomething() {
+    log(Level.FINER, () -> "Problem : " + generateDiagnostic());
+  }
+}
+```
+
+위와 같이 메시지 자체도 함수형 인터페이스를 인자로 받고 (사실 위와 같은 구조에서라면 메시지 자체를 인자로 받는 것이 가능하겠으나, 실제로는 로직 수행 도중 필요할 때 로그를 기록하기에)
+람다로 전달해서 사용하면 메시지 자체가 그 때 까지 연기된다.
+
+이와 같은 구조로 구현하는 방식이 조건부 연기 방식이라고 할 수 있는데 장점은
+- 전송되는 실제 로그의 상태값이 외부로 표출되지 않음
+- 로그로 표현하고자 하는 메시지의 경우 그때 그때 유동적으로 표현이 가능함
+
+과 같은 이점이 있다.
+
+3. 실행 어라운드
+
+```java
+import com.jk.spring.java.modern.chapter3.BufferedReaderProcessor;
+import java.io.BufferedReader;
+import java.io.FileReader;
+
+public class ReadSomeFile {
+
+  public void readSomeFile() {
+    String oneLine = processFile(BufferedReader::readLine);
+    String twoLines = processFile((BufferedReader b) -> b.readLine() + b.readLine());
+  }
+
+  public static String processFile(BufferedReaderProcessor p) throws IOException {
+    try (BufferedReader br = new BufferedReader(
+        new FileReader("ModernJavaInAction/chap9/data.txt"))) {
+      return p.process(br);
+    }
+  }
+
+  public interface BufferedReaderProcessor {
+
+    String process(BufferedReader b) throws IOException;
+  }
+}
+```
+
+위에서 `oneLine` 의 경우 하나의 라인만 읽기에 하나만 읽게 메소드 참조를 통해 인자로써 전달하였고 `twoLine` 의 경우 두 개의 라인을
+읽기 위해서 내부의 람다를 변형해서 전달하였다.
+
+같은 실행문이지만 안에 전달되는 함수가 다른 실행 계획에 맞게 다른 메서드를 인자로써 전달하기에 가독성과 유연성을 챙길 수 있게 되었다.
