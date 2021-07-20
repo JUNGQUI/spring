@@ -136,5 +136,117 @@ abstract class OnlineBanking {
 이와 같이 다른 작업을 지켜보고 있다가 이벤트를 발생시켜 멀티쓰레드 처럼 사용하는 패턴을 옵저버 패턴이라고 한다.
 
 ```java
+public interface Observer {
+  void notify(String tweet);
+}
 
+public class Guardian implements Observer {
+
+  @Override
+  public void notify(String tweet) {
+    if (StringUtils.contains(tweet, "queen")) {
+      System.out.println("Yet more new from London... " + tweet);
+    }
+  }
+}
+public class LeMonde implements Observer {
+
+  @Override
+  public void notify(String tweet) {
+    if (StringUtils.contains(tweet, "wine")) {
+      System.out.println("Today chees, wine and news! " + tweet);
+    }
+  }
+}
+public class NYTimes implements Observer {
+
+  @Override
+  public void notify(String tweet) {
+    if (StringUtils.contains(tweet, "money")) {
+      System.out.println("Breaking new in NY! " + tweet);
+    }
+  }
+}
 ```
+
+위 코드는 이벤트 발생 여부를 확인하고 이벤트 발생 시 수행하는 로직이다. 이 부분을 observer 라고 부른다.
+
+---
+
+```java
+public interface Subject {
+  void registerObserver(Observer o);
+  void notifyObservers(String tweet);
+
+}
+
+
+public class Feed implements Subject {
+
+  private final List<Observer> observers = new ArrayList<>();
+
+  @Override
+  public void registerObserver(Observer o) {
+    this.observers.add(o);
+  }
+
+  @Override
+  public void notifyObservers(String tweet) {
+    observers.forEach(o -> o.notify(tweet));
+  }
+}
+```
+
+그리고 이 부분은 실제 이벤트가 발생 했을 때 옵저버에 이벤트를 전달하는 객체로 발생 시 `Observer.notify()` 를 호출하여 적절한 옵저버에
+이벤트를 발생시킨다.
+
+```java
+class FeedTest {
+  @Test
+  void feedTest() {
+    String testTweet = "The queen said her favourite book is Modern Java in Action!";
+
+    Feed f = new Feed();
+
+    f.registerObserver(new NYTimes());
+    f.registerObserver(new Guardian());
+    f.registerObserver(new LeMonde());
+    f.notifyObservers(testTweet);
+
+    Feed forLambda = new Feed();
+    forLambda.registerObserver((String tweet) -> {
+      if (StringUtils.contains(tweet, "money")) {
+        System.out.println("Breaking news in NY! " + tweet);
+      }
+    });
+    forLambda.registerObserver((String tweet) -> {
+      if (StringUtils.contains(tweet, "queen")) {
+        System.out.println("Yet more new from London... " + tweet);
+      }
+    });
+    forLambda.registerObserver((String tweet) -> {
+      if (StringUtils.contains(tweet, "wine")) {
+        System.out.println("Today chees, wine and news! " + tweet);
+      }
+    });
+    forLambda.notifyObservers(testTweet);
+  }
+}
+```
+
+실제 사용은 이와 같이 진행된다.
+
+1. `Feed` 에 `Observer` 를 등록하고 등록 시 기존에 `observer` 를 상속받아 새로 생성한 각 클래스를 주입한다.
+2. 이벤트 발생 시 `feed` 에서 `notify` 를 호출한다.
+3. 이벤트에 맞게 적절한 클래스가 해당 내역에 대해 처리한다.
+
+이 중 적절한 클래스 부분에 대해 람다식으로 표현이 가능하다.
+
+옵저버 패턴의 경우도 전달받는 파라미터가 함수이자 인터페이스 자체도 함수형 인터페이스로 이루어져 있기 때문에 이벤트 전달 시 수행하는 로직을
+람다식으로 표현이 가능하다.
+
+그래서 위와 같이 해당하는 이벤트 자체를 함수로 즉석에서 만들어 옵저버에 등록을 해주면 기존 클래스를 사용해서 호출하던 방식과 동일하게 구현이 가능하다.
+
+---
+
+[다음](./RefactoringDesignPattern2.md)

@@ -309,3 +309,5 @@ public class ReadSomeFile {
 읽기 위해서 내부의 람다를 변형해서 전달하였다.
 
 같은 실행문이지만 안에 전달되는 함수가 다른 실행 계획에 맞게 다른 메서드를 인자로써 전달하기에 가독성과 유연성을 챙길 수 있게 되었다.
+
+[다음](./RefactoringDesignPattern1.md)
