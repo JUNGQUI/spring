@@ -204,3 +204,88 @@ if 구절이 늘어날수록 가독성이 떨어지고 추후에 ProductType 이
 부분에서 디자인 패턴을 적용한 이점이 사라지게 된다.
 
 이러한 부분들을 람다 표현식을 이용해서 간단하게 해결 할 수 있다.
+
+---
+
+- 람다 테스팅
+
+람다 자체는 함수형 인터페이스로 함수 형태를 띄는 경우가 많고, 한 클래스나 메서드 안에 종속적으로 있는 부분들이 많다. 이러한 부분들에 대한
+테스트를 어떻게 해야 할까?
+
+답은 아주 심플한데, 람다식 자체에 대한 결과를 직접적으로 만들어서 테스트를 해보는 것이다.
+
+```java
+public class Point {
+  private final int x;
+  private final int y;
+  
+  private Point(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+  public int getX() { return x; }
+  public int getY() { return y; }
+  public Point moveRightBy(int x) {
+    return new Point(this.x + x, this.y);
+  }
+}
+
+public class testForLambda {
+  @Test
+  public void testMoveRightBy() throws Exception {
+    Point p1 = new Point(5, 5);
+    Point p2 = p1.moveRightBy(10);
+    assertEquals(15, p2.getX());
+    assertEquals(5, p2.getY());
+  }
+}
+```
+
+위와 같이 연산 자체에 대한 결과를 개발자가 직접 정해 정해져있는 답이 나오는지를 확인한다. 테스트라는 것이 사실 대단한 로직이 필요한게 아니고
+제한된 조건 (혹은 제약시키는 조건) 에서 원하는 결과값이 나오는지만 확인을 하면 되기 때문에 (대신 실패 케이스도 정상작동하는지, 다른 작동들은 이상 없는지도 확인이 필요하다)
+이런 식으로 람다식에 대한 테스트는 평상시 유닛테스트를 만들듯이 진행하면 된다.
+
+```java
+import java.util.Comparator;
+
+public class Point {
+
+  private final int x;
+  private final int y;
+
+  private Point(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
+
+  public int getX() {
+    return x;
+  }
+
+  public int getY() {
+    return y;
+  }
+
+  public Point moveRightBy(int x) {
+    return new Point(this.x + x, this.y);
+  }
+
+  public final static Comparator<Point> compareByXAndThenY = Comparator.comparing(Point::getX).thenComparing(Point::getY);
+}
+
+public class testForLambda {
+
+  @Test
+  public void testComparingTwoPoints() throws Exception {
+    Point p1 = new Point(10, 15);
+    Point p2 = new Point(10, 20);
+    int result = Point.compareByXAndThenY.compare(p1, p2);
+    assertTrue(result < 0); // p1의 x와 p2의 x는 같지만, p1의 y와 p2의 y는 p1이 작기에 음수가 리턴된다.
+  }
+}
+```
+
+위 코드도 결국 도출될 값 자체를 계산한 뒤 그 값으로 나오는지를 확인하는 테스트이다.
+
+이처럼 앞서 말했듯이 람다 테스트는 최대한 쪼개어 로직을 분해하고 분해하는 과정에서의 테스트가 필요할 경우 그 분해에 대한 assert 를 통해
+값 하나 하나를 비교해가면 테스트가 가능하다.
