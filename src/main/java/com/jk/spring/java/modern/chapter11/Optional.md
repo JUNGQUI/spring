@@ -101,3 +101,17 @@ orElse 의 경우 Optional 객체에서 null 이 발생했을 때 null 대신 �
 > 메모리 블럭이 날아가는 형식을 취하는 반면, orElseGet의 경우 파라미터 자체를 Supplier 로 받기 때문에 실제로 orElseGet 으로 유입이 되는 순간
 > Supplier 를 통해 값을 제공하기에 생성해 두는 등 자원 소모가 발생하지 않는다.
 
+- Optional 스트림 조작
+
+위와 같이 Optional 은 Stream API 를 통한 파이프라인 구축이 가능하다. 이렇게 구현이 가능하기에 if 를 중첩으로 사용해야 할 필요가 없어지고
+깔끔한 코드를 구현 할 수 있다.
+
+---
+
+- Default action & Optional unwrap
+
+- get 은 가장 간단하면서 안전하지 않은 메서드다. NPE 를 피하고자 Optional 을 사용했는데, 값이 없으면 `NoSuchElementException` 을 발생시킨다.
+- orElse 와 orElseGet 의 경우 Null 일 경우에 실행되는 메서드로 기본값을 제공하는데 사용된다.
+- orElseThrow 는 orElse, orElseGet 과 동일하되 리턴값이 아니라 예외를 발생시킨다.
+- ifPresent 는 Collection 에서 isEmpty 와 비슷한 역할을 한다. null 이 아닌 값이 제공되는 상태인지 확인할 수 있다.
+- 

@@ -5,13 +5,15 @@ import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.finalAndStatic.JKStaticMethod;
 import com.jk.spring.lambda.JKLambda;
 import com.jk.spring.lock.JKLock;
-import org.junit.Test;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 
 public class JKTestNotePad {
 
@@ -252,5 +254,12 @@ public class JKTestNotePad {
         } catch (Exception ex) {
             System.out.println("J Tag");
         }
+    }
+
+    @Test
+    void durationTeset() {
+        Duration hourOf8 = Duration.ofHours(8);
+
+        System.out.println(hourOf8.toHours());
     }
 }
