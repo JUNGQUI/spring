@@ -114,4 +114,47 @@ orElse 의 경우 Optional 객체에서 null 이 발생했을 때 null 대신 �
 - orElse 와 orElseGet 의 경우 Null 일 경우에 실행되는 메서드로 기본값을 제공하는데 사용된다.
 - orElseThrow 는 orElse, orElseGet 과 동일하되 리턴값이 아니라 예외를 발생시킨다.
 - ifPresent 는 Collection 에서 isEmpty 와 비슷한 역할을 한다. null 이 아닌 값이 제공되는 상태인지 확인할 수 있다.
-- 
+
+
+---
+
+- Optional + Stream
+
+앞서 이야기했듯이 optional 은 Stream API 를 사용할 수 있다. 이런 부분을 이용해서 여러가지 조작이 가능하다.
+
+```java
+import com.jk.spring.java.modern.chapter11.Insurance;
+import com.jk.spring.java.modern.chapter11.Person;
+
+public class NullSafe {
+
+  public Optional<Insurance> nullSafeFindCheapestInsurance(Optional<Person> person, Optional<Car> car) {
+    return person.flatMap(p -> car.map(c -> findCheapestInsurance(p, c)));
+  }
+  
+  public Insurance findCheapestInsurance(Person person, Car car) {
+    // 저렴한 보험 찾기 logic
+    return new Insurance();
+  }
+}
+```
+
+위와 같이 flatMap 을 통해 값의 유무를 파이프라인 내에서 처리하고 있을 경우 다음 로직을 수행하게 할 수 있다.
+
+당연히 filter 메서드도 사용이 가능하다.
+
+```java
+import com.jk.spring.java.modern.chapter11.Insurance;
+import com.jk.spring.java.modern.chapter11.Person;
+
+public class NullSafe {
+
+  public Insurance findInsurance(Optional<Person> person, String insuranceName) {
+    return person.flatMap(Person::getCar)
+        .flatMap(Car::getInsurance)
+        .filter(insurance -> insurance.getName().equals(insuranceName)) // filter 로 걸러 줄 수 있다.
+        .orElse(null);
+  }
+}
+```
+
