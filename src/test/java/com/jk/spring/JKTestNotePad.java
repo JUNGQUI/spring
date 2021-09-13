@@ -5,13 +5,14 @@ import com.jk.spring.finalAndStatic.FinalAndStatic;
 import com.jk.spring.finalAndStatic.JKStaticMethod;
 import com.jk.spring.lambda.JKLambda;
 import com.jk.spring.lock.JKLock;
-import org.junit.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class JKTestNotePad {
 
@@ -252,5 +253,14 @@ public class JKTestNotePad {
         } catch (Exception ex) {
             System.out.println("J Tag");
         }
+    }
+
+    @Test
+    void textTest() {
+        String someDoubleString = "53.5";
+        String someDoubleString2 = "53.0";
+
+        Assertions.assertFalse(someDoubleString.endsWith(".0"));
+        Assertions.assertTrue(someDoubleString2.endsWith(".0"));
     }
 }
