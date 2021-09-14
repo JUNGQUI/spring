@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class JKTestNotePad {
@@ -257,7 +258,15 @@ public class JKTestNotePad {
     }
 
     @Test
-    void durationTeset() {
+    void textTest() {
+        String someDoubleString = "53.5";
+        String someDoubleString2 = "53.0";
+
+        Assertions.assertFalse(someDoubleString.endsWith(".0"));
+        Assertions.assertTrue(someDoubleString2.endsWith(".0"));
+    }
+
+    void durationTest() {
         Duration hourOf8 = Duration.ofHours(8);
 
         System.out.println(hourOf8.toHours());

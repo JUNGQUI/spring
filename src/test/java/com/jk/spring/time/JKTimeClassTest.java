@@ -2,9 +2,14 @@ package com.jk.spring.time;
 
 import java.sql.Date;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,5 +57,43 @@ public class JKTimeClassTest {
 		Assertions.assertEquals(jkTimeClass.getDuration().getSeconds()%3600, secondOfDiff%3600);
 
 		Assertions.assertEquals(jkTimeClass.getPeriod().getDays(), dayOfMonth2 - dayOfMonth1);
+	}
+
+	@Test
+	public void calculationLocalDate() {
+		LocalDate a = LocalDate.of(2021, 8, 1);
+		LocalDate b = LocalDate.of(2255, 5, 2);
+
+		long betweenDays = ChronoUnit.DAYS.between(a, b);
+		long betweenDaysByPeriod = this.calculateMonthDays(a, b);
+
+		Assertions.assertEquals(betweenDaysByPeriod, betweenDays);
+	}
+
+	private long calculateMonthDays(LocalDate startDate, LocalDate endDate) {
+		Period period = Period.between(startDate, endDate);
+		int startYear = startDate.getYear();
+		LocalDate startMonth = LocalDate.from(startDate);
+		int yearDays = 0;
+		int monthDays = 0;
+
+		for (int i = 0; i < period.getYears(); i++) {
+			yearDays += LocalDate.of(startYear + i, 12, 31).getDayOfYear();
+		}
+
+		for (int i = 1; i < period.getMonths(); i++) {
+			startMonth = startMonth.plusMonths(1);
+			monthDays += YearMonth.from(startMonth).atEndOfMonth().getDayOfMonth();
+
+			if (startMonth.getMonthValue() == 12) {
+				startMonth = startMonth.plusYears(period.getYears());
+			}
+		}
+
+		monthDays += YearMonth.from(startDate).atEndOfMonth().getDayOfMonth() - startDate.getDayOfMonth() + 1;
+		Duration.of(1, ChronoUnit.DAYS);
+		return yearDays
+				+ monthDays
+				+ (period.getDays());
 	}
 }
