@@ -6,6 +6,8 @@ import com.jk.spring.finalAndStatic.JKStaticMethod;
 import com.jk.spring.lambda.JKLambda;
 import com.jk.spring.lock.JKLock;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -262,5 +264,11 @@ public class JKTestNotePad {
 
         Assertions.assertFalse(someDoubleString.endsWith(".0"));
         Assertions.assertTrue(someDoubleString2.endsWith(".0"));
+    }
+
+    void durationTest() {
+        Duration hourOf8 = Duration.ofHours(8);
+
+        System.out.println(hourOf8.toHours());
     }
 }
