@@ -1,6 +1,7 @@
 package com.jk.spring.time;
 
 import java.sql.Date;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.time.YearMonth;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -95,5 +97,39 @@ public class JKTimeClassTest {
 		return yearDays
 				+ monthDays
 				+ (period.getDays());
+	}
+
+	@Test
+	public void temporalAdjusters() {
+		LocalDate now = LocalDate.now();
+		LocalDate nextSunday = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+		LocalDate endOfMonth = now.with(TemporalAdjusters.lastDayOfMonth());
+
+		LocalDate nextSundayByHandMade = LocalDate.now();
+
+		while(!nextSundayByHandMade.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+			nextSundayByHandMade = nextSundayByHandMade.plusDays(1);
+		}
+
+		Assertions.assertEquals(nextSundayByHandMade.getDayOfMonth(), nextSunday.getDayOfMonth());
+		Assertions.assertEquals(YearMonth.now().atEndOfMonth(), endOfMonth);
+	}
+
+	@Test
+	public void CustomTemporalTest() {
+		LocalDate now = LocalDate.now();
+		LocalDate nextDay = LocalDate.now();
+		NextWorkingDay nextWorkingDay = new NextWorkingDay();
+		now = now.with(nextWorkingDay);
+
+		if (nextDay.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
+			nextDay = nextDay.plusDays(3);
+		} else if (nextDay.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
+			nextDay = nextDay.plusDays(2);
+		} else {
+			nextDay = nextDay.plusDays(1);
+		}
+
+		Assertions.assertEquals(now, nextDay);
 	}
 }

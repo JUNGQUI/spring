@@ -130,3 +130,52 @@ period 를 이용하면 단순히 몇년, 몇개월, 몇일의 차이만 난다�
 이를 풀어내려면 위와 같이 모든 요소를 고려한 별도의 메소드가 필요할 정도로 복잡해진다.
 
 이와 같이 무조건적으로 사용하는게 아닌 특정 목적에 부합되게 Duration 과 Period 를 적절히 섞어서 사용 해야 한다.
+
+### TemporalAdjusters
+
+다음 월요일, 이 달의 마지막 날 등을 가져오려고 할 때 with 메서드와 `TemporalAdjuster` 에서 제공해주는 정적 팩토리 메서드로
+이러한 기능을 사용 할 수 있다.
+
+```java
+import static java.time.temporal.TemporalAdjusters.*;
+
+import java.time.DayOfWeek;
+
+public class JKAdjuster {
+
+  public void localDateOfWith() {
+    LocalDate date1 = LocalDate.of(2021, 9, 18);
+    LocalDate date2 = date1.with(nextOrSame(DayOfWeek.SUNDAY)); // 2021-09-19
+    LocalDate date3 = date2.with(lastDayOfMonth()); // 2021-09-30
+  }
+}
+```
+
+이런 방식으로 `TemporalAdjusters` 를 이용하면 특정 조건에 맞는 날짜를 쉽게 가져올 수 있다.
+
+또한 `TemporalAdjuster` 를 상속 받아 커스텀 adjuster 를 만들어 별도로 사용 할 수 있다.
+
+```java
+import java.time.temporal.TemporalAdjuster;
+
+public class NextWorkingDay implements TemporalAdjuster {
+  @Override
+  public Temporal adjustInto(Temporal temporal) {
+    DayOfWeek dayOfWeek = DayOfWeek.of(temporal.get(ChronoField.DAY_OF_WEEK));
+
+    return temporal.plus(extractPlusDay(dayOfWeek), ChronoUnit.DAYS);
+  }
+
+  private int extractPlusDay(DayOfWeek now) {
+    if (now.equals(DayOfWeek.FRIDAY)) {
+      return 3;
+    }
+
+    if (now.equals(DayOfWeek.SATURDAY)) {
+      return 2;
+    }
+
+    return 1;
+  }
+}
+```
