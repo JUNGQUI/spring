@@ -17,3 +17,79 @@
 병렬로써 다른 데이터를 처리하게 되면 CPU 가 낭비되지 않고 애플리케이션의 생산성을 극대화 할 수 있다.
 
 이런 환경에서 자바는 `CompletableFuture` 를 통해 병렬성 처리를 원할히 할 수 있게 제시하고 있다.
+
+### Executor 와 스레드 풀
+
+스레드풀에서 풀은 pool 이라는 의미로 말 그대로 스레드가 모여있는 개념이라고 생각하면 되는데, 쉽게 생각해서 특정 개수만큼의 스레드가
+항상 만들어져있는 상태에서 대기하고 큐에 들어오는 순서에 따라 스레드가 태스크를 하나씩 할당받는 것이라고 볼 수 있다.
+
+이렇게 하는 것이 좋은 이유는 스레드를 만드는 비용이 만만치 않기 때문에 요청이 올때마다 스레드를 만드는 것은 비효율적이며 다 사용한
+스레드를 없애는게 아닌 풀에 유지한 상태로 다음 태스크를 받아서 수행할 수 있게 하는 것이 재사용성 측면에서 우수하기 때문이다.
+
+Executor 는 이러한 스레드풀을 이용한 프레임워크로 간단한 메서드를 통해 join 등의 연산으로 스레드 결과를 합치는 등 더 유용하게 사용이
+가능하다.
+
+이렇게 좋은 스레드 풀에도 단점이 있는데
+
+1. 개수 제한
+
+스레드풀을 설정 할 때 초기에 스레드 개수를 정하게 된다. 이는 크게 이상이 없는데 문제는 스레드 풀을 넘는 요청이 들어왔을 때 수행할 경우
+이전 태스크가 끝나기 전까지 다른 태스크는 대기상태로 들어간다. 그런데 인터넷 상에서 타임아웃이 정해져있는 요청이나 I/O 를 기다리는 태스크가
+있을 경우 진행되지도 않고 타임아웃 예외가 발생하거나 I/O 를 기다리기 위해 많은 시간을 소비 할 수 있다.
+
+2. 프로세스 유지
+
+스레드로 돌리기 시작하면 가장 깜빡하는 부분이 스레드 완료 전 메인 스레드의 종료이다. 병렬로 돌아가는 작업을 진행하는 도중 join 으로 기다리지
+않거나 무시하고 메인 스레드가 종료하게 되면 작업을 진행하던 다른 스레드는 결과를 주지 못하고 종료되게 된다.
+
+위와 같은 부분에 대해서 주의해야 한다.
+
+스레드를 이용한 작업은 다음과 같이 만들 수 있다. `f(x)` 와 `g(x)` 가 엄청난 시간을 잡아먹는 함수라고 가정 할 때
+
+```java
+class ThreadExample {
+  public static void main(String[] args) throws InterruptedException {
+    int x = 1337;
+    Result result = new Result();
+    
+    Thread t1 = new Thread(() -> result.left = f(x));
+    Thread t2 = new Thread(() -> result.left = g(x));
+    t1.start();
+    t2.start();
+    t1.join();
+    t2.join();
+    System.out.println(result.left + result.right);
+  }
+  
+  private static class Result {
+    private int left;
+    private int right;
+  }
+}
+```
+
+이와 같이 표현이 가능하며 `ExecutorService` 를 이용하면
+
+```java
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class ExecutorServiceExample {
+
+  public static void main(String[] args) throws ExecutionException, InterruptedException {
+    int x = 1337;
+
+    ExecutorService executorService = Executors.newFixedThreadPool(2);
+    Future<Integer> left = executorService.submit(() -> f(x));
+    Future<Integer> right = executorService.submit(() -> g(x));
+    System.out.println(left.get() + right.get());
+    
+    executorService.shutdown();
+  }
+}
+```
+
+이와 같이 `Future` 를 이용해서 비동기 형식으로 돌리고 `get()` 을 이용해서 join 을 진행하면 간편하게 비동기 API 로 진행할 수 있다.
+
+### 리액티브 형식 API
+
