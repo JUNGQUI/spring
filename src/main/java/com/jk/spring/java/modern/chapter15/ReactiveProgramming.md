@@ -93,3 +93,89 @@ public class ExecutorServiceExample {
 
 ### 리액티브 형식 API
 
+쉽게 생각하면 리액티브한 형식의 API 는 파라미터로 콜백을 받는다. 이렇게 받은 콜백 형식의 함수는 내부에서 실행을 하던 중 결과가 준비되면 람다로
+이 콜백 파라미터를 실행해서 join 을 통해 값을 합친다.
+
+```java
+public class CallbackStyleExample {
+  public static void main(String args[]) {
+    int x = 1337;
+    Result result = new Result();
+
+    f(x, (int y) -> {
+      result.setLeft(y);
+      System.out.println(result.getLeft() + result.getRight());
+    });
+
+    g(x, (int y) -> {
+      result.setRight(y);
+      System.out.println(result.getLeft() + result.getRight());
+    });
+  }
+
+  static void f(int x, IntConsumer dealWithResult) {
+
+  }
+
+  static void g(int x, IntConsumer dealWithResult) {
+
+  }
+}
+```
+
+위와 같은 형식으로 진행을 할 수 있다. 그러나 문제점이 있는데 결과가 수시로 변경된다.
+그 이유로는 락이 걸려있지 않기 때문에 result 에 left 만 할당된 상태로 출력될수도, right 만 할당된 상태로 출력될수도,
+둘 다 할당되지 않은 상태에서 출력이 될 수도 있다.
+
+이러한 부분은
+
+1. if-then-else 형식으로 확인 작업(락) 을 진행한 후 호출
+2. Future 를 이용해서 처리
+
+와 같은 방법으로 해결 할 수 있다.
+
+### Thread Sleep
+
+락과 관련되서 가장 간단하게 순서를 정할 수 있는게 스레드를 임의로 멈추는 thread.sleep() 이 바로 그것이다.
+
+그렇다고 이 방법이 좋은가 에 대해서는 단연코 아니다 라고 할 수 있다.
+
+```java
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class DoSomething {
+
+  public void someMethod() {
+    work1();
+    Thread.sleep(10000);
+    work2();
+  }
+}
+
+public class DoSomethingWithExecutor {
+
+  public void someMethodWithExecutor() {
+    ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
+
+    work1();
+    scheduledExecutorService.schedule(DoSomethingWithExecutor::work2, 10, TimeUnit.SECONDS);
+  }
+  
+  public static void work1() {
+    System.out.println("work 1");
+  }
+  
+  public static void work2() {
+    System.out.println("work 2");
+  }
+}
+```
+스레드풀에서 작업을 한다고 가정했을 때 `DoSomething` 는 work1 을 할당을 받긴 했지만 Thread.sleep() 으로 인해 멈춘 상태에서
+시간이 지난 후 풀리자마자 work2 를 실행하고 종료한다. 이렇게 될 경우 work2 가 먼저 끝난다면 work1 은 정상적으로 처리 되지 않고 종료된다.
+
+하지만 `DoSomethingWithExecutor` 의 경우 work1 이 실행 된 후 스케쥴러에 work2 를 10초 뒤에 실행하게끔 큐에 추가한 뒤
+종료한다. 이렇게 할 경우 work1 이 무사히 완료됨은 물론이고 메인 스레드가 종료된 후에도 work2 는 작업을 계속 할 수 있다.
+
+### 예외 처리
