@@ -179,3 +179,61 @@ public class DoSomethingWithExecutor {
 종료한다. 이렇게 할 경우 work1 이 무사히 완료됨은 물론이고 메인 스레드가 종료된 후에도 work2 는 작업을 계속 할 수 있다.
 
 ### 예외 처리
+
+Reactive 형식으로 코드를 짜게 되면 에러나 예외를 처리하는 부분도 일반적인 함수들과는 조금 다르다. 결과 자체도 콜백으로 받고 있기 때문에 예외 또한 마찬가지로 콜백 형식으로 받아서 처리하게 된다.
+
+```java
+public class ReactiveTest {
+  void f(int x, Consumer<Integer> dealWithResult, Consumer<Throwable> dealWithException);
+}
+```
+
+예시를 보면 초기값 x, 값과 같이 수행할 로직 dealWithResult, 그리고 예외를 받았을때 처리하는 dealWithException 콜백이 존재한다.
+
+이런 식으로 예외에 대해 이벤트를 발생 시켰을 때 실행할 콜백을 넣어주면 자연스럽게 콜백에서 처리를 하게 된다.
+
+### 박스와 채널 모델
+
+동시성 모델을 가장 잘 설계하고 개념화하는 기법이 박스와 채널 모델인데 예시는 다음과 같다.
+
+`x -> r(q1(p(x)), q2(p(x)))`
+
+박스와 채널 모델에선 각 함수들을 하나의 박스로 표현하고 전체 로직 수행을 하나의 채널로 표현하다.
+수식만을 본다면 이게 무슨 괴랄한 모양인지 이해하기 어렵지만 x 가 주어지고 먼저 `함수 p` 를 거치고 해당 결과 값을 
+각각 함수 `q1` 과 `q2` 의 인자로 주고, 이런 인자를 받아서 최종적으로 함수 `r` 에 줘서 결과값을 리턴하는 케이스다.
+
+가장 간단한 구현식은 다음과 같다.
+
+```java
+public class Test {
+  public void test1(int x) {
+    int t = p(x);
+    System.out.println(r(q1(t), q2(t)));
+  }
+}
+```
+
+하지만 병렬적으로 처리하고자 하는 목적에 부합하지 않기에, 각 함수 `q1`, `q2` 를 future 로 감싸면 아래와 같은 구조가 된다.
+
+```java
+import java.util.concurrent.ExecutorService;
+
+public class Test {
+
+  ExecutorService executorService;
+
+  public void test1(int x) {
+    int t = p(x);
+    Future<Integer> a1 = executorService.submit(() -> q1(t));
+    Future<Integer> a2 = executorService.submit(() -> q2(t));
+    System.out.println(r(a1.get(), a2.get()));
+  }
+}
+```
+
+하지만 이 또한 문제점이 있는데, `r` 의 경우 비동기가 아닌 동기처리이며 병렬성을 극대화 하기 위해서 전체 코드를 모두 future 로 감싸야 한다.
+
+위와 같은 구조도 구동은 되지만 박스와 채널이 점점 많아지고 코드가 방대해질수록 많은 태스크가 get() 메서드를 호출해 future 가 끝나기만을
+바라게 될 수 있다.
+
+그래서 사용하는데 `CompletableFuture` 에서의 콤비네이터 기능이다.

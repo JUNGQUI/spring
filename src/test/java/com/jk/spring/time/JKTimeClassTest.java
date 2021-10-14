@@ -116,7 +116,7 @@ public class JKTimeClassTest {
 	}
 
 	@Test
-	public void CustomTemporalTest() {
+	public void customTemporalTest() {
 		LocalDate now = LocalDate.now();
 		LocalDate nextDay = LocalDate.now();
 		NextWorkingDay nextWorkingDay = new NextWorkingDay();
@@ -131,5 +131,16 @@ public class JKTimeClassTest {
 		}
 
 		Assertions.assertEquals(now, nextDay);
+	}
+
+	@Test
+	public void compareTo() {
+		int smaller = Duration.ofHours(7).compareTo(Duration.ofHours(8));
+		int same = Duration.ofHours(8).compareTo(Duration.ofHours(8));
+		int bigger = Duration.ofHours(9).compareTo(Duration.ofHours(8));
+
+		Assertions.assertEquals(-1, smaller);
+		Assertions.assertEquals(0, same);
+		Assertions.assertEquals(1, bigger);
 	}
 }
