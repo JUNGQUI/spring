@@ -236,4 +236,119 @@ public class Test {
 위와 같은 구조도 구동은 되지만 박스와 채널이 점점 많아지고 코드가 방대해질수록 많은 태스크가 get() 메서드를 호출해 future 가 끝나기만을
 바라게 될 수 있다.
 
-그래서 사용하는데 `CompletableFuture` 에서의 콤비네이터 기능이다.
+그래서 사용하는게 `CompletableFuture` 에서의 콤비네이터 기능이다.
+
+### CompletableFuture, 콤비네이터
+
+Future 와 CompletableFuture 의 차이점부터 먼저 알아보자.
+
+우선 Future 는 앞서 봤듯이 콜백을 주고 추후에 `get()` 을 통해 연산을 진행하여 결과를 전달 받는다. 다만 여기서 문제가 생기는데
+Future 의 경우 새로운 생성자를 통해 생성을 하면서 연산과정을 나중으로 미룰 수 없다.
+
+하지만 CompletableFuture 의 경우는 조금 다르다. 아래 코드를 살펴보자.
+
+```java
+public class CFComplete {
+  public static void main(String[] args) {
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
+    
+    int x = 1337;
+    
+    CompletableFuture<Integer> a = new CompletableFuture<>();
+    executorService.submit(() -> a.complete(f(x)));
+
+    // Future 는 구현을 해야 한다는 점과 비교해보면 매우 대조적이다.
+//    Future<Integer> b = new Future<Integer>() {
+//      @Override
+//      public boolean cancel(boolean b) {
+//        return false;
+//      }
+//
+//      @Override
+//      public boolean isCancelled() {
+//        return false;
+//      }
+//
+//      @Override
+//      public boolean isDone() {
+//        return false;
+//      }
+//
+//      @Override
+//      public Integer get() throws InterruptedException, ExecutionException {
+//        return null;
+//      }
+//
+//      @Override
+//      public Integer get(long l, TimeUnit timeUnit)
+//          throws InterruptedException, ExecutionException, TimeoutException {
+//        return null;
+//      }
+//    };
+    
+    int b = g(x);
+    
+    System.out.println(a.get() + b);
+    
+    executorService.shutdown();
+  }
+}
+```
+
+위 예시 코드를 보자면 CompletableFuture 의 경우 아무런 callback 을 전달 받지 않고 생성자를 통해 생성해두되, 추후 다른 함수를
+직접 CompletableFuture 에 할당해줌으로써 유동적으로 구현할 수 있다.
+
+이로써 좀 더 유동적으로 사용이 가능하고 CompletableFuture 에 어떤 함수를 매핑해주느냐에 따라 결과를 다르게 가져갈 수 있기에 재사용
+측면에서 유리하다. 이러한 특성 때문에 이름 또한 'Completable' '완성 가능한' 이라는 이름이 붙게 되었다.
+
+### combination
+
+CompletableFuture (이하 CF) 에 다른 기능 또한 하나 더 있는데 바로 조합이다.
+
+`CompletableFuture<V> thenCombine(CompletableFuture<U> other, BiFunction<T, U, V> fn)` 이 수식을 보면
+다른 CF 와 새로운 함수를 조합해서 사용하는 기능이다. 이와 같은 유사한 기능이 stream API 에도 있는데 
+
+```text
+myStream.map(...)
+        .filter(...)
+        .sum()
+```
+
+이와 같이 하나의 stream 에 대해 map 을 통해 특정한 연산을 거치고 filter 를 통해 특정 값들은 걸래내며, 나머지 값들의 합을 구하는 연산을
+각 연산을 조합해서 하나로 만들어서 표현한 것이다.
+
+그래서 위의 `CFComplete` 클래스에 새로운 CF 인자 c 를 추가하고 thenComplete 를 사용해서 조합을 하면
+
+```java
+import java.util.concurrent.CompletableFuture;
+
+public class CFCombine {
+
+  public static void main(String[] args) {
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
+
+    int x = 1337;
+
+    CompletableFuture<Integer> a = new CompletableFuture<>();
+    CompletableFuture<Integer> b = new CompletableFuture<>();
+    CompletableFuture<Integer> c = a.thenCombine(b, Integer::sum);
+    executorService.submit(() -> a.complete(f(x)));
+    executorService.submit(() -> b.complete(g(x)));
+
+    System.out.println(c.get());
+    executorService.shutdown();
+  }
+}
+```
+
+이와 같은 구조가 된다. a, b 는 일반적인 CF 니 넘어가고 c 를 살펴보면 a 와 b 를 조합해서 결과를 받을건데, 각 연산의 결과를 sum 하겠다는
+의미이다. 즉, 각 future 는 리턴받는 값을 BiFunction 의 인자로 넣어서 결과를 받고 C 로 반환한다는 의미이다.
+
+결과적으로 일반적인 Future 와 다른 점은 c의 경우 a, b 가 둘 다 끝난 상태가 되었을 경우 스레드 풀에서 연산을 만든다. 
+
+Future.get() 과 다른 점이 바로 이 부분인데 c 가 먼저 시작되고 블럭이 되는 것이 아니라 시작은 먼저 할 지라도 블록은 되지 않는다는 것이다.
+
+일반적으로 get() 을 수행해도 그렇게 큰 리소스 낭비가 일어나진 않지만 이러한 방법이 병렬 실행의 효율성은 높이고 데드락은 피하는 최상의 해결책을
+자연스럽게 구현할 수 있고 java 에서 이를 제공해준다는 점이 가장 큰 이점이라 할 수 있다.
+
+### publish - subscribe, Reactive
