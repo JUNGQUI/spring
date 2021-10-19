@@ -28,6 +28,7 @@ class SimpleCellTest {
   void cellAddTestWithArithmeticCell() {
     int x = 10, y = 20;
 
+
     SimpleCell c1 = new SimpleCell("C1");
     SimpleCell c2 = new SimpleCell("C2");
     ArithmeticCell c3 = new ArithmeticCell("C3");
