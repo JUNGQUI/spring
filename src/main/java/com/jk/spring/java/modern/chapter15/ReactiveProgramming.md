@@ -352,3 +352,36 @@ Future.get() 과 다른 점이 바로 이 부분인데 c 가 먼저 시작되고
 자연스럽게 구현할 수 있고 java 에서 이를 제공해준다는 점이 가장 큰 이점이라 할 수 있다.
 
 ### publish - subscribe, Reactive
+
+발행 - 구독 모델의 경우 클라이언트가 서버에 값을 요청해서 받아가는 일반적인 상황이 아닌, 특정한 타스크를 등록하고 (발행) 이를 받기를 기다리는
+클라이언트가 타스크가 완료되면 결과를 받아가는 모델 (구독) 이라고 볼 수 있다.
+
+이 Future 와 CompletableFuture 를 통해 리액티브 프로그래밍을 할 수 있는데, 이를 살펴볼 예정이다.
+
+```java
+private class SimpleCell {
+  private int value = 0;
+  private  String name;
+  public SimpleCell(String name) {
+    this.name = name;
+  }
+}
+```
+
+위 코드는 엑셀에서 셀에 값을 부여하는 수식을 표현한 것이다. 심플하고 셀 자체에 값을 부여하는 목적에 부합한다. 그런데 엑셀에서는 수식을
+통해 셀의 값을 더하는 등의 로직을 수행 할 수 있다.
+
+문제는 언젠가 발생하는 그 때에 실행될게 아니라 언제일지 모르는 상황에서 '값이 바뀌었다' 는 상황이 되었을때 두 값을 더하는 수식이 발생해야 한다고
+가정을 하면 이벤트가 발생했을 때 수식을 실행해야 한다.
+
+```java
+interface Publisher<T> {
+  void subscribe(Subscriber<? super T> subscriber);
+}
+```
+
+이럴 때 publisher 와 subscriber 를 이용해서 메서드를 구현 할 수 있다.
+
+```java
+private class SimpleCell implements Publisher<Integer>
+```
