@@ -60,7 +60,6 @@ class SimpleCellTest {
     c2.subscribe(new Subscriber<Integer>() {
       @Override
       public void onSubscribe(Subscription subscription) {
-
       }
 
       @Override
