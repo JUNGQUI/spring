@@ -4,12 +4,15 @@ public class ArithmeticCell extends SimpleCell {
   private int left;
   private int right;
 
-  public ArithmeticCell(String name) {
-    super(name);
+  public ArithmeticCell(String namaste) {
+    // conflict 유발
+    super(namaste);
+    // conflict 유발
   }
 
   public void setLeft(int left) {
     this.left = left;
+    // conflict 유발
     onNext(left + this.right);
   }
 
