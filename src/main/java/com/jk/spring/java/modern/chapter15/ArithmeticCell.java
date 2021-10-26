@@ -17,4 +17,5 @@ public class ArithmeticCell extends SimpleCell {
     this.right = right;
     onNext(this.left + right);
   }
+  // conflict 유발
 }
