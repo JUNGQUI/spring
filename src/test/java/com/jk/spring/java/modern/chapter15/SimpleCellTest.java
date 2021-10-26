@@ -78,19 +78,6 @@ class SimpleCellTest {
       }
     });
 
-//    c1.subscribe(c3);
-//    c2.subscribe(c3);
-
-//    c1.onNext(x);
-//    c3.setLeft(c3.getValue());
-//    assertEquals(x, c3.getValue());
-//    c2.onNext(y);
-//    c3.setRight(c3.getValue());
-//    assertEquals(x + y, c3.getValue());
-//    c2.onNext(y);
-//    c3.setLeft(c3.getValue());
-//    assertEquals(y + y, c3.getValue());
-
     c1.onNext(x);
     assertEquals(x, c3.getValue());
     c2.onNext(y);
