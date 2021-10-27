@@ -2,6 +2,8 @@ package com.jk.spring.java.modern.chapter15;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.concurrent.Flow.Subscriber;
+import java.util.concurrent.Flow.Subscription;
 import org.junit.jupiter.api.Test;
 
 class SimpleCellTest {
@@ -35,18 +37,55 @@ class SimpleCellTest {
     SimpleCell c2 = new SimpleCell("C2");
     ArithmeticCell c3 = new ArithmeticCell("C3");
 
-    c1.subscribe(c3);
-    c2.subscribe(c3);
+    c1.subscribe(new Subscriber<Integer>() {
+      @Override
+      public void onSubscribe(Subscription subscription) {
+
+      }
+
+      @Override
+      public void onNext(Integer integer) {
+        c3.setLeft(integer);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+
+      }
+
+      @Override
+      public void onComplete() {
+
+      }
+    });
+
+    c2.subscribe(new Subscriber<Integer>() {
+      @Override
+      public void onSubscribe(Subscription subscription) {
+      }
+
+      @Override
+      public void onNext(Integer integer) {
+        c3.setRight(integer);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+
+      }
+
+      @Override
+      public void onComplete() {
+
+      }
+    });
 
     // conflict 유발
     c1.onNext(x);
-    c3.setLeft(c3.getValue());
     assertEquals(x, c3.getValue());
     c2.onNext(y);
-    // conflict 유발
-    c3.setRight(c3.getValue());
     assertEquals(x + y, c3.getValue());
     c2.onNext(y);
-    // conflict 유발
+    assertEquals(x + y, c3.getValue());
   }
 }
