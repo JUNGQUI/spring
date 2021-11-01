@@ -10,6 +10,10 @@ class SimpleCellTest {
   void cellAddTest() {
     int x = 10, y = 20;
 
+    double test1 = (double)40 * ((double)13/(double)7);
+    double test2 = (double)40 * ((double)7/(double)7);
+    double test3 = (double)40 * ((double)10/(double)7) * ((double)6/(double)8);
+
     // conflict 유발
     SimpleCell c1 = new SimpleCell("C1");
     SimpleCell c2 = new SimpleCell("C2");
