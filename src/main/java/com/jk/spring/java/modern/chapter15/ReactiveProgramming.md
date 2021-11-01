@@ -383,5 +383,203 @@ interface Publisher<T> {
 이럴 때 publisher 와 subscriber 를 이용해서 메서드를 구현 할 수 있다.
 
 ```java
-private class SimpleCell implements Publisher<Integer>
+import java.util.concurrent.Flow.Subscriber;
+
+private class SimpleCell implements Publisher<Integer>, Subscriber<Integer> {
+  private int value = 0;
+  private String name;
+  private List<Subscriber> subscribers = new ArrayList<>();
+
+  public SimpleCell(String name) {
+    this.name = name;
+  }
+
+  public int getValue() {
+    return this.value;
+  }
+
+  @Override
+  public void subscribe(Subscriber<? super Integer> subscriber) {
+    subscribers.add(subscriber);
+  }
+
+  @Override
+  public void onSubscribe(Subscription subscription) {
+
+  }
+
+  private void notifyAllSubscribers() {
+    subscribers.forEach(subscriber -> subscriber.onNext(this.value));
+  }
+
+  @Override
+  public void onNext(Integer newValue) {
+    this.value = newValue;
+    System.out.println(this.name + ":" + this.value);
+    notifyAllSubscribers();
+  }
+
+  @Override
+  public void onError(Throwable throwable) {
+
+  }
+
+  @Override
+  public void onComplete() {
+
+  }
+}
 ```
+
+주로 봐야 할 부분은 onNext 와 notifyAllSubscriber 이다. onNext 를 통해 다음 단계로 이동하고 noti 를 통해 구독하고 있는 모든
+구독자에게 onNext 로 발생한 값을 전달하는데 이를 통해 `이벤트가 발생했을 때` 작업을 진행하게 할 수 있다.
+
+또한 이런 구조를 이용해서 셀 내 수식 중 덧셈을 계산하게 짜낼 수 있는데, 책에서는 아래와 같이 메서드 참조를 통해 구현했다.
+
+```java
+import com.jk.spring.java.modern.chapter15.SimpleCell;
+
+public class ArithmeticCell extends SimpleCell {
+
+  private int left;
+  private int right;
+
+  public ArithmeticCell(String name) {
+    super(name);
+  }
+
+  public void setLeft(int left) {
+    this.left = left;
+    onNext(left + this.right);
+  }
+
+  public void setRight(int right) {
+    this.right = right;
+    onNext(this.left + right);
+  }
+}
+
+public class ArithmeticCellTest {
+
+  void test() {
+    ArithmeticCell c3 = new ArithmeticCell("C3");
+    SimpleCell c1 = new SimpleCell("C1");
+    SimpleCell c2 = new SimpleCell("C2");
+    
+    c1.subscribe(c3::setLeft);
+    c2.subscribe(c3::setRight);
+    
+    c1.onNext(10);
+    c2.onNext(20);
+    c1.onNext(15);
+  }
+}
+```
+
+그러나 subscribe 는 전달받는 인자로 subscriber 를 받기에 c3 자체를 인자로 받아야 하고 따라서 테스트 코드처럼 수행하기 위해서는
+아래와 같이 수정이 필요하다.
+
+```java
+public class ArithmeticCellTest {
+
+  void test() {
+    ArithmeticCell c3 = new ArithmeticCell("C3");
+    SimpleCell c1 = new SimpleCell("C1");
+    SimpleCell c2 = new SimpleCell("C2");
+
+    c1.subscribe(new Subscriber<Integer>() {
+      @Override
+      public void onSubscribe(Subscription subscription) {
+
+      }
+
+      @Override
+      public void onNext(Integer integer) {
+        c3.setLeft(integer);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+
+      }
+
+      @Override
+      public void onComplete() {
+
+      }
+    });
+
+    c2.subscribe(new Subscriber<Integer>() {
+      @Override
+      public void onSubscribe(Subscription subscription) {
+
+      }
+
+      @Override
+      public void onNext(Integer integer) {
+        c3.setRight(integer);
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+
+      }
+
+      @Override
+      public void onComplete() {
+
+      }
+    });
+    
+    c1.onNext(10);
+    c2.onNext(20);
+    c1.onNext(15);
+  }
+}
+```
+
+이런식으로 구현하면 결과가 바뀔때 마다 c1의 경우 left, c2 의 경우 right 값이 변경되어 합산한 값이 자동으로 c3 에 전달된다.
+이렇게 이벤트가 발생 할 때 마다 값의 갱신이 이루어져 우리가 원했던 이벤트 발생 시 마다 값의 계산이 진행되는 흐름을 갖게 된다.
+
+이렇게 구독-발행 모델에 대해 알아봤는데 중요한 개념이 빠져있는데 바로 압력/역압력이라는 개념이다.
+
+압력은 말 그대로 정상적인 흐름에 부가되는 '부하' 라고 보면 된다. 위 두 값을 합산하는 로직을 예시로 들자면, 초기 설계 당시에는 셀이 몇개 없는데
+이 로직이 갑자기 확장되면서 여러 셀을, 그것도 여러 위치의 셀들에 대해 동시다발적으로 입력이 되고 동시에 변경된 내역에 따라 여러 셀의 합산이 이루어지고
+그 결과 값 또한 다시 합산의 인자로 쓰인다고 가정해보면 부하가 없을 수 없다.
+
+이러한 부분들에 대해 부하를 잘 제어하기 위해 역압력(back-pressure) 라는 개념이 등장하게 된다.
+
+### 역압력 (Back-Pressure)
+
+자바 9에서부터 Subscriber 인터페이스에는 `void onSubscribe(Subscription subscription)` 이라는 메서드가 추가되었다.
+
+이 메서드는 Pub-Sub 간 채널이 연결되면 첫 이벤트로 호출이 되는데 Subscription 은 다음과 같은 구조로 이루어져 있다.
+
+```java
+interface Subscription {
+  void cancel();
+  void request(long n);
+}
+```
+
+간단하게 설명하자면 request 의 경우 전달받는 n 을 통해 실제 요청수를 제어하는데 쓰인다. 내부에 로직을 어떻게 하느냐에 따라 다르지만
+보통 정해진 값(limit)이 존재하는데 n 의 값만큼 요청을 하는 상황이라면 잘라내고 다시 보내든가 하는 식으로 진행 할 수 있다.
+
+cancel 의 경우 딱 봐도 알겠지만 현재 구독을 통해 처리하던 부분을 취소하는 것이다. 이를 통해 구독자에게 잠시 대기나 다시 시도 등을 시도하게
+할 수 있다.
+
+중점이 되는 포인트는 `Subscription 을 통해 구독자에게 발행하는 것을 제어` 할 수 있다는 점이다.
+
+이와 같이 내부에 정해진 값과 전달 받은 인자를 통해서 요청한 값에 대해 제어를 해서 요청 개수를 조절하는 걸 역압, back-pressure 라고
+볼 수 있다.
+
+### 리액티브 시스템 vs 리액티브 프로그래밍
+
+두 가지 말은 같은듯 다른데 시스템의 경우 전체적으로 런타임 환경이 변화에 대응하다록 설계한 아키텍트가 있는 프로그램 자체를 뜻하고
+리액티브 프로그래밍은 메시지 주도 (message-driven) 방식을 주요 속성 삼아 만들어진 형식을 의미한다.
+
+보통 message-driven 을 event-driven 방식이라고도 말할 수 있는데 의미는 비슷하다. message-driven 의 경우 메시지가 처리가 완료된
+메시지를 기다리는 컴포넌트에 전달이 되고 전달받은 컴포넌트가 반응(react) 하는 것이라면 event-driven 의 경우 이벤트가 발생하면
+해당 이벤트를 기다리는 컴포넌트가 반응(react) 하는 것이다.
+
+결과론적으로 보면 둘 다 동일한 로직이기 때문에 리액티브 프로그래밍은 message-driven, event-driven 이라고 할 수 있다.
