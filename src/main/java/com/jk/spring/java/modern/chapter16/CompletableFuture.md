@@ -83,3 +83,55 @@ isDone 메서드를 통해 계산이 끝났는지 확인 할 수 있고 cancel �
 
 앞 챕터에서도 이야기 했지만 이러한 기능을 보완, 제공해주는게 CompletableFuture 다.
 
+### CompletableFuture 로 비동기 구현
+
+비동기 애플리케이션을 구현할텐데, 최저가 검색 애플리케이션을 구현할 것이다.
+
+```java
+public class Shop {
+  private static final Random randomGenerator = new Random();
+  
+  public double getPrice(String product) {
+    return calculatePrice(product);
+  }
+
+  public static void delay() {
+    try {
+      Thread.sleep(1000L);
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
+  private double calculatePrice(String product) {
+    delay();
+    return randomGenerator.nextDouble() * product.charAt(0) + product.charAt(1);
+  }
+}
+```
+
+상점에서 코드를 통해 가격을 가져오는 부분은 이와 같이 구현했는데, 이해를 쉽게 하기 위해 delay 메서드를 써서 일정 시간이 소모 된다고
+가정했고, 동기 방식이기 때문에 sleep 을 통해 블록시켰다.
+
+이를 비동기로 바꾸려면 우선 이렇게 구현이 되야 할 것이다.
+
+```java
+import java.util.concurrent.CompletableFuture;
+
+public class Shop {
+
+  public Future<Double> getPriceAsync(String product) {
+    CompletableFuture<Double> futurePrice = new CompletableFuture<>();
+    
+    new Thread(() -> {
+      double price = calculatePrice(product);
+      futurePrice.complete(price);
+    }).start();
+    
+    return futurePrice;
+  }
+}
+```
+
+달라진 점은 스레드를 새로 만들어서 동기 작업이 필요한 부분을 감싸고 그 결과를 CompletableFuture 내에 심어놨다는 것이다.
+
