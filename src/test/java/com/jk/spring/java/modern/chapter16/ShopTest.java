@@ -19,6 +19,8 @@ class ShopTest {
 
     doSomethingElse();
 
+    long startGet = System.nanoTime();
+
     try {
       double price = futurePrice.get();
       System.out.printf("Price is %.2f%n", price);
@@ -26,8 +28,14 @@ class ShopTest {
       throw new RuntimeException(ex);
     }
 
-    long retrievalTime = ((System.nanoTime() - start) / 1_000_000);
-    System.out.println("sync : " + retrievalTime);
+    long retrievalTime = ((System.nanoTime() - startGet) / 1_000_000);
+    System.out.println("async get : " + retrievalTime);
+
+    long startSync = System.nanoTime();
+    double syncPrice = shop.getPrice("my favorite product");
+    long syncTime = ((System.nanoTime() - startSync) / 1_000_000);
+
+    System.out.println("sync : " + syncTime);
   }
 
   private void doSomethingElse() {
