@@ -2,13 +2,15 @@ package com.jk.spring.java.modern.chapter16;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.Test;
 
 class ShopTest {
 
   @Test
-  public void asyncPriceTest() {
+  void asyncPriceTest() {
     Shop shop = new Shop("BestShop");
 
     long start = System.nanoTime();
@@ -36,6 +38,36 @@ class ShopTest {
     long syncTime = ((System.nanoTime() - startSync) / 1_000_000);
 
     System.out.println("sync : " + syncTime);
+  }
+
+  @Test
+  void shopGetPriceTest() {
+    List<Shop> shopList = Arrays.asList(
+        new Shop("BestPrice"),
+        new Shop("LetsSaveBig"),
+        new Shop("MyFavoriteShop"),
+        new Shop("BuyItAll")
+    );
+
+    long start = System.nanoTime();
+
+    System.out.println(ShopMethod.findPrices(shopList, "myPhone275"));
+    System.out.println((System.nanoTime() - start) / 1_000_000);
+  }
+
+  @Test
+  void shopGetPriceParallelsTest() {
+    List<Shop> shopList = Arrays.asList(
+        new Shop("BestPrice"),
+        new Shop("LetsSaveBig"),
+        new Shop("MyFavoriteShop"),
+        new Shop("BuyItAll")
+    );
+
+    long start = System.nanoTime();
+
+    System.out.println(ShopMethod.findPricesParallels(shopList, "myPhone275"));
+    System.out.println((System.nanoTime() - start) / 1_000_000);
   }
 
   private void doSomethingElse() {
