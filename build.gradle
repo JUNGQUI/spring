@@ -89,6 +89,10 @@ compileQuerydsl {
     options.annotationProcessorPath = configurations.querydsl
 }
 
+test {
+    useJUnitPlatform()
+}
+
 tasks.withType(JavaCompile) { options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir) }
 
 //querydsl 추가 끝
