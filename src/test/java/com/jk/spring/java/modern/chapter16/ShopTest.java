@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class ShopTest {
@@ -72,5 +74,30 @@ class ShopTest {
 
   private void doSomethingElse() {
     System.out.println("Do Something Else");
+  }
+
+  @Test
+  void shopCompletableFutureTest() {
+    List<Shop> shopList = Arrays.asList(
+        new Shop("BestPrice"),
+        new Shop("LetsSaveBig"),
+        new Shop("MyFavoriteShop"),
+        new Shop("BuyItAll")
+    );
+
+    ShopCompletableFuture shopCompletableFuture = new ShopCompletableFuture();
+    List<CompletableFuture<String>> results = shopCompletableFuture.getPriceAsync(shopList, "myPhone275");
+
+    List<String> result = results.stream()
+        .map(c -> {
+          try {
+            return c.get();
+          } catch (Exception ex) {
+            return "";
+          }
+        })
+        .collect(Collectors.toList());
+
+    result.forEach(System.out::println);
   }
 }

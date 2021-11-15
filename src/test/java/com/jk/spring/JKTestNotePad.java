@@ -7,12 +7,14 @@ import com.jk.spring.lambda.JKLambda;
 import com.jk.spring.lock.JKLock;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+import lombok.Data;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -270,5 +272,31 @@ public class JKTestNotePad {
         Duration hourOf8 = Duration.ofHours(8);
 
         System.out.println(hourOf8.toHours());
+    }
+
+    @Test
+    void streamCompareTest() {
+        SomeClass someClass = new SomeClass();
+        SomeClass someClass2 = new SomeClass();
+
+        someClass.setSomC("1");
+        someClass.setSomD(LocalDate.of(2021, 11, 10));
+        someClass2.setSomC("2");
+        someClass2.setSomD(LocalDate.of(2021, 11, 11));
+
+        List<SomeClass> someClassList = Arrays.asList(someClass, someClass2);
+
+        SomeClass someClass3 = someClassList.stream()
+            .sorted(Comparator.comparing(SomeClass::getSomD).reversed())
+            .findFirst()
+            .get();
+        
+        Assertions.assertEquals(someClass2.getSomD(), someClass3.getSomD());
+    }
+
+    @Data
+    private class SomeClass {
+        private String somC;
+        private LocalDate somD;
     }
 }
