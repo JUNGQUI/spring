@@ -12,8 +12,6 @@ public class ShopSupplyAsync {
     return CompletableFuture.supplyAsync(() -> calculatePrice(product));
   }
 
-
-
   public static void delay() {
     try {
       Thread.sleep(1000L);

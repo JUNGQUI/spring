@@ -2,6 +2,7 @@ package com.jk.spring.java.modern.chapter16;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.jk.spring.java.modern.chapter16.Discount.Code;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +37,7 @@ class ShopTest {
     System.out.println("async get : " + retrievalTime);
 
     long startSync = System.nanoTime();
-    double syncPrice = shop.getPrice("my favorite product");
+    String syncPrice = shop.getPrice("my favorite product");
     long syncTime = ((System.nanoTime() - startSync) / 1_000_000);
 
     System.out.println("sync : " + syncTime);
@@ -99,5 +100,57 @@ class ShopTest {
         .collect(Collectors.toList());
 
     result.forEach(System.out::println);
+  }
+
+  @Test
+  void shopQuoteTest() {
+    Shop bestPrice = new Shop("BestPrice");
+    Shop letsSaveBig = new Shop("LetsSaveBig");
+    Shop myFavoriteShop = new Shop("MyFavoriteShop");
+    Shop buyItAll = new Shop("BuyItAll");
+
+    Quote bestPriceQuote = Quote.parse(bestPrice.getPrice("myPhone275"));
+    Quote letsSaveBigQuote = Quote.parse(letsSaveBig.getPrice("myPhone275"));
+    Quote myFavoriteShopQuote = Quote.parse(myFavoriteShop.getPrice("myPhone275"));
+    Quote buyItAllQuote = Quote.parse(buyItAll.getPrice("myPhone275"));
+
+    System.out.println(bestPriceQuote.getPrice());
+    System.out.println(Discount.applyDiscount(bestPriceQuote));
+    System.out.println(letsSaveBigQuote.getPrice());
+    System.out.println(Discount.applyDiscount(letsSaveBigQuote));
+    System.out.println(myFavoriteShopQuote.getPrice());
+    System.out.println(Discount.applyDiscount(myFavoriteShopQuote));
+    System.out.println(buyItAllQuote.getPrice());
+    System.out.println(Discount.applyDiscount(buyItAllQuote));
+  }
+
+  @Test
+  void shopQuoteStreamTest() {
+    // 대략 8초~ 소요
+    List<Shop> shopList = Arrays.asList(
+        new Shop("BestPrice"),
+        new Shop("LetsSaveBig"),
+        new Shop("MyFavoriteShop"),
+        new Shop("BuyItAll")
+    );
+
+    List<String> prices = ShopMethod.findPricesStream(shopList, "myPhone275");
+
+    prices.forEach(System.out::println);
+  }
+
+  @Test
+  void combineTest() {
+    // 대략 2초~ 소요
+    List<Shop> shopList = Arrays.asList(
+        new Shop("BestPrice"),
+        new Shop("LetsSaveBig"),
+        new Shop("MyFavoriteShop"),
+        new Shop("BuyItAll")
+    );
+
+    List<String> prices = ShopMethod.findPricesCombine(shopList, "myPhone275");
+
+    prices.forEach(System.out::println);
   }
 }

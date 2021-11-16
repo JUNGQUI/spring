@@ -78,3 +78,113 @@ public class SomeClass {
 
 ### 비동기 작업 파이프라인 만들기
 
+상점에 할인 서비스를 제공하기로 하고 해당 할인율에 대해 등급을 제공해 총 5가지 할인율을 제공한다고 가정해보자.
+
+이런 경우 할인 율은 바뀔지언정 할인에 대한 등급은 변경이 일어날 일이 별로 없기 때문에 Enum 으로 제공하는게 나쁘지 않아 보인다.
+
+```java
+public class Discount {
+  public enum Code {
+    NONE(0), SILVER(5), GOLD(10), PLATINUM(15), DIAMOND(20);
+    
+    private final int percentage;
+    
+    Code(int percentage) {
+      this.percentage = percentage;
+    }
+  }
+}
+```
+
+그리고 할인율 적용에 따라 `getPrice()` 메서드도 shopName : price : DiscountCode 형식으로 반환하게 변경해야 한다.
+
+```java
+public class Shop {
+  public String getPrice(String product) {
+    double price = calculatePrice(product);
+    Discount.Code code = Discount.Code.values() [
+        random.nextInt(Discount.Code.values().length)];
+    return String.format("%s:%.2f:%s", name, price, code);
+  }
+  
+  private double calculatePrice(String product) {
+    delay();
+    return random.nextDouble() * product.charAt(0) + product.charAt(1);
+  }
+}
+```
+
+기본적으로 할인율에 대한 정의가 끝났으므로 할인 서비스를 구현해야 한다. 상점 이름, 할인전 가격, 할인된 가격 정보를 포함하는 `Quote` 클래스를
+구현해서 정적 클래스 `parse` 를 통해 정보를 전달 받으면 (getPrice를 통해) 이를 분석해서 할인율을 적용시킨 후 결과를 전달한다.
+
+```java
+package com.jk.spring.java.modern.chapter16;
+
+public class Quote {
+  private final String shopName;
+  private final double price;
+  private final Discount.Code discountCode;
+
+  public Quote(String shopName, double price, Discount.Code code) {
+    this.shopName = shopName;
+    this.price = price;
+    this.discountCode = code;
+  }
+
+  public static Quote parse(String s) {
+    String[] split = s.split(":");
+    String shopName = split[0];
+    double price = Double.parseDouble(split[1]);
+    Discount.Code discountCode = Discount.Code.valueOf(split[2]);
+    return new Quote(shopName, price, discountCode);
+  }
+
+  public String getShopName() {
+    return shopName;
+  }
+
+  public double getPrice() {
+    return price;
+  }
+
+  public Discount.Code getDiscountCode() {
+    return discountCode;
+  }
+}
+```
+
+```java
+public class CombineClass {
+  public static List<String> findPricesCombine(List<Shop> shops, String product) {
+    // 상점에 맞게 스레드풀 생성
+    Executor executor = Executors.newFixedThreadPool(Math.min(shops.size(), 100),
+        runnable -> {
+          Thread t = new Thread(runnable);
+          t.setDaemon(true);
+          return t;
+        });
+
+    // 스트림으로 파이프라인 구축
+    List<CompletableFuture<String>> priceFutures = shops.stream()
+        // 내부에 CompletabeFuture 로 계산식을 감싼다. 이걸 통해 병렬적 처리 -> delay 가 있는 부분
+        .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product), executor))
+        // future 에 대해 완료되었을 경우 parse 작업 진행
+        .map(future -> future.thenApply(Quote::parse))
+        // quote 로 나온 future 에 대해 한번 더 감싸서 실행한다. -> delay 가 있는 부분
+        .map(future -> future.thenCompose(
+            quote -> CompletableFuture.supplyAsync(
+                () -> Discount.applyDiscount(quote), executor)
+        ))
+        .collect(toList());
+
+    // 새로운 스트림으로 Stream<CompletableFuture> 를 만들어 전체 로직 수행에 대해 병렬적 처리, 이후 결과 전송
+    return priceFutures.stream()
+        .map(CompletableFuture::join)
+        .collect(toList());
+  }
+}
+```
+
+이와 같이 stream 과 CompletableFuture 를 적절하게 섞어서 사용한다면 병렬적 구현을 조금 더 손쉽게 할 수 있다.
+
+### Future 리플렉션, CompletableFuture 리플렉션
