@@ -9,6 +9,7 @@ class JKSortTest {
 
 	Bubble bubble = new Bubble();
 	Select select = new Select();
+	Merge merge = new Merge();
 
 	@Test
 	void BubbleTest() {
@@ -22,5 +23,12 @@ class JKSortTest {
 		int[] afterSort = select.sort(needSort);
 
 		System.out.println("J Tag");
+	}
+
+	@Test
+	void MergeTest() {
+		int[] afterSort = merge.sort(needSort);
+
+		System.out.println("J tag");
 	}
 }
