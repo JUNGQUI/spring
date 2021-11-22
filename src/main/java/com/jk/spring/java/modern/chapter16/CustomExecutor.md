@@ -188,3 +188,86 @@ public class CombineClass {
 이와 같이 stream 과 CompletableFuture 를 적절하게 섞어서 사용한다면 병렬적 구현을 조금 더 손쉽게 할 수 있다.
 
 ### Future 리플렉션, CompletableFuture 리플렉션
+
+```java
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+public class Java7DoubleFuture {
+
+  public void joinFuture() {
+    // 스레드 생성
+    ExecutorService executor = Executors.newCachedThreadPool();
+    
+    // USD -> EUR 로 환전하는 task
+    final Future<Double> futureRate = executor.submit(new Callable<Double>() {
+      public Double call() {
+        return exchangeService.getRate(Money.EUR, Money.USD);
+      }
+    });
+    
+    // 환전된 금액으로 상점에서 판매하는 상품의 가격을 구하는 task
+    Future<Double> futurePriceInUSD = executor.submit(new Callable<Double>() {
+      public Double call() {
+        double priceInEUR = shop.getPrice(product);
+        return priceInEUR * futureRate.get();
+      }
+    });
+    // ...
+  }
+}
+```
+
+위 코드는 java 7 에서 future 를 이용해서 만드는 코드이다. CompletableFuture 로 구현하면 두가지 CompletableFuture 를 구현한 뒤
+join 을 통해 결과를 합치거나, then... 메서드를 통해 가독성 높게 구현할 수 있는데 이러한 부분이 CompletableFuture 의 장점 중 하나이다.
+
+또한 Future 의 경우 계산 결과를 읽을 때 무한정 기다리는 상황이 발생 할 수 있는데, CompletableFuture 의 경우 `orTimeout` 메서드는
+지정된 시간이 지난 후에도 결과가 반환되지 않을 경우 `TimeoutException` 을 결과로 가지는 또 다른 CompletableFuture 로 반환해서
+활용할 수 있게 한다.
+
+사용하는 방법은 Stream API 파이프라인과 동일하게 체이닝을 통해 구현한다.
+
+```java
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
+public class CompletableFutureTimeout {
+
+  public void JKTimeout() {
+    Future<Double> futurePriceInUSD = CompletableFuture.supplyAsync(() -> shop.getPrice(product))
+        .thenCombine(
+            CompletableFuture.supplyAsync(() -> exchangeService.getRate(Money.EUR, Money.USD))
+            , (price, rate) -> price * rate)
+        .orTimeout(3, TimeUnit.SECONDS);
+  }
+}
+```
+
+> Reflection
+> 
+> 자바는 컴파일 언어라 볼 수 있는데 컴파일 되기 전까진 클래스로써 해석이 불가능한데, 컴파일 이후에도 제대로된 클래스에 접근하지 못하는 경우가
+> 있다. 대표적인 예가 구동 직후 spring container 에서 bean factory 가 각 객체에 대한 클래스를 생성할 때 이다.
+> 
+> ```java
+> import lombok.Data; 
+> @Data
+> public class Car {
+>   private String name;
+>   private int highSpeed;
+> }
+> 
+> public class SetCarFromObject {
+>   Car car = new Car();
+>   Object carObj = car;
+>   // compile error
+>   carObj.getHighSpeed();
+> }
+> ```
+> 
+> 위 예시는 아주 간단한 리플렉션에 대한 예시이다. 분명 Object 타입에 여러 클래스 오브젝트를 할당 시킬 순 있다. 여기까진 문제가 없는데
+> 이후에 실제 해당 객체 클래스에서 어떤 메서드를 사용 할 경우 에러가 발생한다.
+> 
+> 이는 Car -> Object 로 변환되면서 기존 객체 클래스의 기능을 상실한 것인데 이를 Reflection 을 이용해 Car 로 살릴 수 있다.
+> 
+> 
+> 
