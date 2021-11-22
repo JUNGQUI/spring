@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class CarReflectionTest {
   @Test
   void reflectionTest() {
-    CarReflection carReflection = new CarReflection();
+    JKConvertByReflection carReflection = new JKConvertByReflection();
     Car car = new Car();
     String someString = "";
     int integer = 1;

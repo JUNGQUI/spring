@@ -267,7 +267,17 @@ public class CompletableFutureTimeout {
 > 위 예시는 아주 간단한 리플렉션에 대한 예시이다. 분명 Object 타입에 여러 클래스 오브젝트를 할당 시킬 순 있다. 여기까진 문제가 없는데
 > 이후에 실제 해당 객체 클래스에서 어떤 메서드를 사용 할 경우 에러가 발생한다.
 > 
-> 이는 Car -> Object 로 변환되면서 기존 객체 클래스의 기능을 상실한 것인데 이를 Reflection 을 이용해 Car 로 살릴 수 있다.
+> 이는 Car -> Object 로 변환되면서 기존 객체 클래스의 기능을 상실한 것인데 이를 Reflection 을 이용해 해당 object 가 Car class 인지
+> 알 수 있다.
 > 
+> ```java
+> public class JKReflection {
+>   public String convertByReflection(Object someObject) {
+>       return someObject.getClass().getName();
+>   }
+> }
+> ```
 > 
-> 
+> 이를 통해 class 명칭을 알 수 있고 이를 이용해서 해당 클래스로 변환이 가능하다. spring bean factory 의 경우 초기 object 로
+> 받아온 객체들에 대해 리플렉션을 이용해서 정확하게 어떤 클래스 인지 알 수 있고 이걸로 객체를 생성한다.
+
