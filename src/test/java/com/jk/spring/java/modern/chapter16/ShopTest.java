@@ -1,8 +1,5 @@
 package com.jk.spring.java.modern.chapter16;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import com.jk.spring.java.modern.chapter16.Discount.Code;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -152,5 +149,28 @@ class ShopTest {
     List<String> prices = ShopMethod.findPricesCombine(shopList, "myPhone275");
 
     prices.forEach(System.out::println);
+  }
+
+  @Test
+  void randomDelay() {
+    List<Shop> shopList = Arrays.asList(
+        new Shop("BestPrice"),
+        new Shop("LetsSaveBig"),
+        new Shop("MyFavoriteShop"),
+        new Shop("BuyItAll")
+    );
+
+    long start = System.nanoTime();
+
+    ShopCompletableFuture shopCompletableFuture = new ShopCompletableFuture();
+    CompletableFuture[] shopCompletableFutures = shopCompletableFuture.findPricesStream(shopList, "myPhone275")
+        .map(f -> f.thenAccept(
+            s -> System.out.println(s + " (done in " + ((System.nanoTime() - start) / 1_000_000) + " msecs)")
+        ))
+        .toArray(CompletableFuture[]::new);
+
+    CompletableFuture.allOf(shopCompletableFutures).join();
+
+    System.out.println("All Shops have now responded in " + ((System.nanoTime() - start) / 1_000_000) + "m secs");
   }
 }

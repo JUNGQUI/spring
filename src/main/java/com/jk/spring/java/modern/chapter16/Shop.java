@@ -20,6 +20,24 @@ public class Shop {
     return String.format("%s:%.2f:%s", getName(), price, code);
   }
 
+  public String getPriceWithRandomDelay(String product) {
+    randomDelay();
+    double price = calculatePrice(product);
+
+    Discount.Code code = Discount.Code.values() [
+        randomGenerator.nextInt(Discount.Code.values().length)];
+    return String.format("%s:%.2f:%s", getName(), price, code);
+  }
+
+  private void randomDelay() {
+    int delay = 500 + randomGenerator.nextInt(2000);
+    try {
+      Thread.sleep(delay);
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
   public Future<Double> getPriceAsync(String product) {
     CompletableFuture<Double> futurePrice = new CompletableFuture<>();
 
