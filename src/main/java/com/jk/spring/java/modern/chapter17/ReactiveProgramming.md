@@ -31,3 +31,64 @@
 
 ### 리액티브 스트림과 플로 API
 
+리액티브 프로그래밍에서 사용하는 스트림을 리액티브 스트림이라 칭하는데 잠재적으로 무한의 비동기 데이터를 순서대로, 블록하지 않는 역압력을 전제해
+처리하는 표준 기술이다.
+
+스트림 처리의 비동기적 특성상 역압력은 필수적인데 리액티브 스트림 프로젝트에서 큰 몇가지 인터페이스가 존재하는데, 자바9의 Flow, Akka 스트림,
+리액터, RxJava, Vert.x 등이 있다.
+
+> 역압력? (back-pressure)
+> 
+> pub-sub model 에서 사용하는 용어로, 하나의 작업이 발생하고 끝날때까지 기다리는 일반적인 모델과 달리 작업을 처리하는 모듈을
+> 구독(subscribe)하고 해당 모듈이 작업을 완료할 경우 이벤트를 발생(publish) 시켜 구독중인 모듈에 작업 종료를 알려 비동기적으로 처리하는
+> 전략 패턴이다.
+> 
+> 여기에서 둘의 속도가 (작업 발생 vs 작업 완료) 별 차이 없다면 꾸준하게 작업이 비동기적으로 진행하며 큰 이점을 가질 수 있으나 완료되는
+> 시간보다 발생하는 시간이 더 빠를 경우 과부하가 일어 날 수 있다.
+> 
+> 이러한 부분을 작업을 처리하는 쪽에서 작업을 요청하는 모듈에 시그널을 보냄으로써 작업 요청의 시간을 조정하는 것을 역압력이라 한다.
+
+Flow 클래스에서는 아래와 같이 4가지 인터페이스를 제공한다.
+
+- Publisher
+- Subscriber
+- Subscription
+- Processor
+
+```java
+import java.util.concurrent.Flow.Subscription;
+
+@FunctionalInterface
+public interface Publisher<T> {
+
+  void subscribe(Subscriber<? super T> s);
+}
+
+public interface Subscriber<T> {
+  void onSubscribe(Subscription s);
+  void onNext(T t);
+  void onError(Throwable t);
+  void onComplete();
+}
+
+public interface Subscription {
+  void request(long n);
+  void cancel();
+}
+
+public interface Processor<T, R> extends Subscriber<T>, Publisher<R> {}
+```
+
+pub-sub 에서 work flow 는 아래와 같이 발행되어야 한다.
+
+`onSubscribe - onNext* - (onError | onComplete)?`
+
+onSubscribe 로 최초 구독 후 onNext 는 로직에 따라 여러번 수행이 될 수 있고, 이후엔 선택에 따라 onError, onComplete (혹은 무한히 가동)
+처리가 되어야 한다.
+
+Subscription 은 request 를 통해 발행자가 구독자에게 얼만큼의 요청을 보낼지 정하고, cancel 의 경우 더이상 구독하지 않겠다는 이벤트를 발생시킨다.
+
+이 리액티브 스트림을 이용한 애플리케이션을 만들건데 조건은 다음과 같다.
+
+- TempInfo : 원격 온도계, 0~99 온도를 임의로 만들어 연속보고
+- TempSubscriber : 레포트를 관찰하면서 온도 스트림 출력
